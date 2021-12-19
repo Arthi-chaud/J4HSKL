@@ -162,29 +162,24 @@ parseParenthesis = Parser $ \s -> do
 
 -- | Parse anything that is a whitespace
 parseWhitespaces :: Parser String
-parseWhitespaces = _parseWhile isSpace
-        
-_parseWhile :: (Char -> Bool) -> Parser String
-_parseWhile f = Parser $ \s -> case s of
-    "" -> Just ("", "")
-    (a:b) -> if f a then runParser ((a:) <$> _parseWhile f) b
-             else Just ("", a:b)
---parseWord :: Parser String
---parseWord = Parser $ \s -> case runParser parseWhitespaces s of
---    Just ("", "") -> Just ([], "")
---    Just ("", a:b) -> runParser ((a :) <$> parseWord) b
---    Just (a, rest) -> Just ([], a ++ rest)
---    _ -> Nothing
+parseWhitespaces = parseWhile isSpace
+    where
+        parseWhile :: (Char -> Bool) -> Parser String
+        parseWhile f = Parser $ \s -> case s of
+            "" -> Just ("", "")
+            (a:b) -> if f a then runParser ((a:) <$> parseWhile f) b
+                     else Just ("", a:b)
+
 
 -- | Parse anything that is not a whitespace
 parseWord :: Parser String
-parseWord = some _parseNotSpace
-
-_parseNotSpace :: Parser Char
-_parseNotSpace = Parser anyCharParser
+parseWord = some parseNotSpace
     where
-        anyCharParser :: ParserFunction Char 
-        anyCharParser s
-            | null s = Nothing
-            | isSpace (head s) = Nothing
-            | otherwise = Just (head s, tail s)
+        parseNotSpace :: Parser Char
+        parseNotSpace = Parser anyCharParser
+            where
+                anyCharParser :: ParserFunction Char 
+                anyCharParser s
+                    | null s = Nothing
+                    | isSpace (head s) = Nothing
+                    | otherwise = Just (head s, tail s)

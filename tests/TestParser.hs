@@ -17,6 +17,10 @@ testSuite = testGroup "Parser module" [
         let expected = Nothing
         testCase "parseChar: No Char in String" $ expected @=? actual,
     do
+        let actual = runParser (parseChar 'z') ""
+        let expected = Nothing
+        testCase "parseChar: empty string" $ expected @=? actual,
+    do
         let actual = runParser (parseChar 'b') "ybcd"
         let expected = Nothing
         testCase "parseChar: Second Char" $ expected @=? actual,
@@ -36,6 +40,14 @@ testSuite = testGroup "Parser module" [
         let actual = runParser (parseAnyChar "bca") "cdef"
         let expected = Just ('c', "def")
         testCase "parseAnyChar: Second Char in string" $ expected @=? actual,
+    do
+        let actual = runParser (parseAnyChar "abc") ""
+        let expected = Nothing
+        testCase "parseAnyChar: empty string" $ expected @=? actual,
+    do
+        let actual = runParser (parseAnyChar "") "abc"
+        let expected = Nothing
+        testCase "parseAnyChar: empty needles" $ expected @=? actual,
     do
         let actual = runParser (parseChar 'a' <|> parseChar 'b') "abcd"
         let expected = Just ('a', "bcd")
@@ -115,7 +127,19 @@ testSuite = testGroup "Parser module" [
     do
         let actual = runParser (parseSome (parseAnyChar "1234") <%> parseChar '2') "1234lol"
         let expected = Nothing
-        testCase "<%> second fail" $ expected @=? actual
+        testCase "<%> second fail" $ expected @=? actual,
+    do
+        let actual = runParser parseWord "1234 lol"
+        let expected = Just ("1234", " lol")
+        testCase "parseWord" $ expected @=? actual,
+    do
+        let actual = runParser parseWord "   1234 lol"
+        let expected = Nothing
+        testCase "parseWord, start with empty spaces" $ expected @=? actual,
+    do
+        let actual = runParser parseWord ""
+        let expected = Nothing
+        testCase "parseWord, empty string" $ expected @=? actual
     -- do
     --     let actual = runParser empty "Hello"
     --     let expected = Nothing

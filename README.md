@@ -1,7 +1,7 @@
-# J4HSKL
+[![FLAPP](assets/logo.png)](assets/logo.png)
 
-# Parse and use JSON in Haskell
+# Manage JSON with Haskell
 
-[![Build](https://github.com/Arthi-chaud/J4HSKL/actions/workflows/build.yml/badge.svg)](https://github.com/Arthi-chaud/J4HSKL/actions/workflows/build.yml)
+[![Build](https://github.com/Arthi-chaud/J4HSKL/actions/workflows/build.yaml/badge.svg)](https://github.com/Arthi-chaud/J4HSKL/actions/workflows/build.yaml)
 [![Documentation](https://img.shields.io/badge/Documentation-Haddock-blue)](https://Arthi-chaud.github.io/J4HSKL/)
-[![Unit Tests](https://github.com/Arthi-chaud/J4HSKL/actions/workflows/unit_tests.yml/badge.svg)](https://github.com/Arthi-chaud/J4HSKL/actions/workflows/unit_tests.yml)
+[![Unit tests](https://github.com/Arthi-chaud/J4HSKL/actions/workflows/unit_tests.yaml/badge.svg)](https://github.com/Arthi-chaud/J4HSKL/actions/workflows/unit_tests.yaml)

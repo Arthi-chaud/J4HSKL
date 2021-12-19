@@ -1,10 +1,10 @@
 name:                J4HSKL
 version:             0.1.0.0
-github:              "githubuser/J4HSKL"
+github:              "Arthi-chaud/J4HSKL"
 license:             BSD3
-author:              "Author name here"
-maintainer:          "example@example.com"
-copyright:           "2021 Author name here"
+author:              "Arthi-chaud"
+maintainer:          "arthur.jamet@gmail.com"
+copyright:           "2021 Arthi-chaud"
 
 extra-source-files:
 - README.md
@@ -17,7 +17,7 @@ extra-source-files:
 # To avoid duplicated efforts in documentation and dealing with the
 # complications of embedding Haddock markup inside cabal files, it is
 # common to point users to the README.md file.
-description:         Please see the README on GitHub at <https://github.com/githubuser/J4HSKL#readme>
+description:         Please see the README on GitHub at <https://github.com/Arthi-chaud/J4HSKL#readme>
 
 dependencies:
 - base >= 4.7 && < 5
@@ -28,10 +28,13 @@ library:
 tests:
   J4HSKL-test:
     main:                Spec.hs
-    source-dirs:         test
+    source-dirs:         tests
     ghc-options:
     - -threaded
     - -rtsopts
     - -with-rtsopts=-N
     dependencies:
     - J4HSKL
+    - HUnit
+    - test-framework
+    - test-framework-hunit

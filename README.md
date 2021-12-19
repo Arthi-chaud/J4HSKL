@@ -1,4 +1,4 @@
-[![FLAPP](assets/logo.png)](assets/logo.png)
+[![J4HSKL](assets/logo.png)](assets/logo.png)
 
 # Manage JSON with Haskell
 

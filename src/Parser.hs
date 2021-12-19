@@ -5,8 +5,11 @@ import Text.Read
 import Data.Char
 import Control.Applicative ( Alternative((<|>), empty), some )
 
+-- | A 'ParserFunction' function take a string a parameter,
+-- maybe returns a successfull value of type 'a' tuppled with a string (the rest of the string)
 type ParserFunction a = String -> Maybe (a, String)
 
+-- | A 'Parser' of type 'a' holds a 'ParserFunction' of same type.
 data Parser a = Parser {
     runParser :: ParserFunction a
 }

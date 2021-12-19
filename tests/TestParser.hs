@@ -91,5 +91,21 @@ testSuite = testGroup "Parser module" [
     do
         let actual = runParser parseWord "  Hello  "
         let expected = Nothing
-        testCase "parseWord: no word in first place" $ expected @=? actual
+        testCase "parseWord: no word in first place" $ expected @=? actual,
+    do
+        let actual = runParser (parseChar 'l' >>= parseChar) "llo"
+        let expected = Just ('l', "o")
+        testCase "monadic parser >>=" $ expected @=? actual,
+    do
+        let actual = runParser (parseChar 'o' >>= parseChar) "llo"
+        let expected = Nothing
+        testCase "monadic parser >>= first fail" $ expected @=? actual,
+    do
+        let actual = runParser (parseChar 'l' >>= parseChar) "lol"
+        let expected = Nothing
+        testCase "monadic parser >>= second fail" $ expected @=? actual
+    -- do
+    --     let actual = runParser empty "Hello"
+    --     let expected = Nothing
+    --     testCase "empty" $ expected @=? actual
     ]

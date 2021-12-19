@@ -3,7 +3,7 @@ module Parser where
 import Data.Maybe (isNothing)
 import Text.Read
 import Data.Char
-import Control.Applicative ( Alternative((<|>), empty), some )
+import Control.Applicative ( Alternative, (<|>), empty, some )
 
 -- | A 'ParserFunction' function take a string a parameter,
 -- maybe returns a successfull value of type 'a' tuppled with a string (the rest of the string)
@@ -24,7 +24,7 @@ instance Functor Parser where
 instance Applicative Parser where
     -- | Creates a 'Parser' which, on call, will always return 'a' and untouched 's'
     pure a = Parser (\s -> Just(a, s))
-    
+
     -- | Applies function of 'fp' on result of 'p'
     (<*>) fp p = Parser (\string -> do
         (f, rest) <- runParser fp string
@@ -85,11 +85,11 @@ parseChar expected = Parser charParser
 parseAnyChar :: String -> Parser Char
 parseAnyChar needles = Parser anyCharParser
     where
-        anyCharParser :: ParserFunction Char 
+        anyCharParser :: ParserFunction Char
         anyCharParser s
             | null s = Nothing
             | head s `elem` needles = Just (head s, tail s)
-            | otherwise = Nothing 
+            | otherwise = Nothing
 
 
 -- | Calls '<&>' and applies 'func' on the result
@@ -102,7 +102,7 @@ parseAndWith func p1 p2 = Parser (\s -> do
 -- | While 'p' doesn't returns 'Nothing', it is called on the rest
 -- Returns an array of parsed values. Never returns 'Nothing'
 parseMany :: Parser a -> Parser [a]
-parseMany p = Parser {runParser = \s -> 
+parseMany p = Parser {runParser = \s ->
     case runParser p s of
         Nothing -> Just ([], s)
         Just (p1, rest) -> runParser ((\p2 -> p1 : p2) <$> parseMany p) rest
@@ -115,7 +115,7 @@ parseSome p1 = (\(a,b) -> a:b) <$> (p1 <&> parseMany p1)
 
 -- | Parse unsigned integer from string
 parseUInt :: Parser Integer
-parseUInt = Parser $ \string -> 
+parseUInt = Parser $ \string ->
     runParser (read <$> parseSome (parseAnyChar ['0'..'9'])) string
 
 -- | Parse signed integer from string
@@ -133,7 +133,7 @@ parseWhiteSpaces = parseMany (parseAnyChar " \t")
 
 -- Extracting parenthesis
 
-_getDepthOffset :: Char -> Int 
+_getDepthOffset :: Char -> Int
 _getDepthOffset '(' = 1
 _getDepthOffset ')' = -1
 _getDepthOffset _ = 0
@@ -141,14 +141,14 @@ _getDepthOffset _ = 0
 -- If the string doesnt start by parenthesis, returns nothing
 _extractParenthesis ::  String -> Int -> Maybe (String, String)
 _extractParenthesis [] 0 = Just ([], [])
-_extractParenthesis [] _ = Nothing 
+_extractParenthesis [] _ = Nothing
 _extractParenthesis (')':rest) 0 = Nothing
 _extractParenthesis ('(':rest) 0 =  do
         (parsed, newRest) <- _extractParenthesis rest 1
         return ('(':parsed, newRest)
-_extractParenthesis (c:rest) 0 = Just ("", c:rest) 
+_extractParenthesis (c:rest) 0 = Just ("", c:rest)
 _extractParenthesis (c:rest) depth = if depth < 0 then Nothing else do
-        (parsed, newRest) <- _extractParenthesis rest (depth + _getDepthOffset c) 
+        (parsed, newRest) <- _extractParenthesis rest (depth + _getDepthOffset c)
         return (c:parsed, newRest)
 
 parseParenthesis :: Parser String
@@ -178,7 +178,7 @@ parseWord = some parseNotSpace
         parseNotSpace :: Parser Char
         parseNotSpace = Parser anyCharParser
             where
-                anyCharParser :: ParserFunction Char 
+                anyCharParser :: ParserFunction Char
                 anyCharParser s
                     | null s = Nothing
                     | isSpace (head s) = Nothing

@@ -4,7 +4,7 @@ import Parser
 import Test.HUnit (Assertion, assertEqual, Testable (test), (@=?), (~=?))
 import Test.Framework (Test, testGroup)
 import Test.Framework.Providers.HUnit (testCase)
-import Control.Applicative ( Alternative((<|>), empty) )
+import Control.Applicative ( Alternative, (<|>), empty )
 
 testSuite :: Test
 testSuite = testGroup "Parser module" [
@@ -103,7 +103,19 @@ testSuite = testGroup "Parser module" [
     do
         let actual = runParser (parseChar 'l' >>= parseChar) "lol"
         let expected = Nothing
-        testCase "monadic parser >>= second fail" $ expected @=? actual
+        testCase "monadic parser >>= second fail" $ expected @=? actual,
+    do
+        let actual = runParser (parseMany (parseAnyChar "1234") <%> parseChar '1') "1234lol"
+        let expected = Just ('1', "234lol")
+        testCase "<%> succeed" $ expected @=? actual,
+    do
+        let actual = runParser (parseSome (parseAnyChar "234") <%> parseChar '1') "1234lol"
+        let expected = Nothing
+        testCase "<%> first fail" $ expected @=? actual,
+    do
+        let actual = runParser (parseSome (parseAnyChar "1234") <%> parseChar '2') "1234lol"
+        let expected = Nothing
+        testCase "<%> second fail" $ expected @=? actual
     -- do
     --     let actual = runParser empty "Hello"
     --     let expected = Nothing

@@ -116,7 +116,7 @@ parseSome p1 = (\(a,b) -> a:b) <$> (p1 <&> parseMany p1)
 -- | Parse unsigned integer from string
 parseUInt :: Parser Integer
 parseUInt = Parser $ \string -> 
-    runParser (read <$> (parseSome (parseAnyChar ['0'..'9']))) string
+    runParser (read <$> parseSome (parseAnyChar ['0'..'9'])) string
 
 -- | Parse signed integer from string
 parseInt :: Parser Integer

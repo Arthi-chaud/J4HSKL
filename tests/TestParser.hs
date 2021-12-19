@@ -4,6 +4,7 @@ import Parser
 import Test.HUnit (Assertion, assertEqual, Testable (test), (@=?), (~=?))
 import Test.Framework (Test, testGroup)
 import Test.Framework.Providers.HUnit (testCase)
+import Control.Applicative ( Alternative((<|>), empty) )
 
 testSuite :: Test
 testSuite = testGroup "Parser module" [
@@ -36,27 +37,27 @@ testSuite = testGroup "Parser module" [
         let expected = Just ('c', "def")
         testCase "parseAnyChar: Second Char in string" $ expected @=? actual,
     do
-        let actual = runParser (parseOr (parseChar 'a') (parseChar 'b')) "abcd"
+        let actual = runParser (parseChar 'a' <|> parseChar 'b') "abcd"
         let expected = Just ('a', "bcd")
         testCase "parseOr: First is Ok" $ expected @=? actual,
     do
-        let actual = runParser (parseOr (parseChar 'a') (parseChar 'b')) "bcda"
+        let actual = runParser (parseChar 'a' <|> parseChar 'b') "bcda"
         let expected = Just ('b', "cda")
         testCase "parseOr: Second is Ok" $ expected @=? actual,
     do
-        let actual = runParser (parseOr (parseChar 'a') (parseChar 'b')) "xyz"
+        let actual = runParser (parseChar 'a' <|> parseChar 'b') "xyz"
         let expected = Nothing
         testCase "parseOr: none is Ok" $ expected @=? actual,
     do
-        let actual = runParser (parseAnd (parseChar 'a') (parseChar 'b')) "abcd"
+        let actual = runParser (parseChar 'a' <&> parseChar 'b') "abcd"
         let expected = Just (('a','b'), "cd")
         testCase "parseAnd: all is Ok" $ expected @=? actual,
     do
-        let actual = runParser (parseAnd (parseChar 'a') (parseChar 'b')) "bcda"
+        let actual = runParser (parseChar 'a' <&> parseChar 'b') "bcda"
         let expected = Nothing
         testCase "parseAnd: first is invalid" $ expected @=? actual,
     do
-        let actual = runParser (parseAnd (parseChar 'a') (parseChar 'b')) "acd"
+        let actual = runParser (parseChar 'a' <&> parseChar 'b') "acd"
         let expected = Nothing
         testCase "parseAnd: second is invalid" $ expected @=? actual,
     do

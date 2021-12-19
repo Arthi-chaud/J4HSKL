@@ -58,54 +58,37 @@ testSuite = testGroup "Parser module" [
     do
         let actual = runParser (parseAnd (parseChar 'a') (parseChar 'b')) "acd"
         let expected = Nothing
-        testCase "parseAnd: second is invalid" $ assertEqual "ParseAnd with second invalid" expected actual
+        testCase "parseAnd: second is invalid" $ assertEqual "ParseAnd with second invalid" expected actual,
+    do
+        let actual = runParser (parseAndWith (\ x y -> [x,y]) (parseChar 'a') (parseChar 'b')) "abcd"
+        let expected = Just ("ab", "cd")
+        testCase "parseAndWith: merge results" $ assertEqual "ParseAndwith with valid returns" expected actual,
+    do
+        let actual = runParser (parseMany (parseChar ' ')) "  foobar"
+        let expected = Just ("  ", "foobar")
+        testCase "parseMany: remove leading spaces" $ assertEqual "ParseMany remove leading spaces" expected actual,
+    do
+        let actual = runParser (parseMany (parseChar ' ')) "foobar  "
+        let expected = Just ("", "foobar  ")
+        testCase "parseMany: remove leading spaces when none" $ assertEqual "ParseMany remove no spaces" expected actual,
+    do
+        let actual = runParser (parseSome (parseAnyChar ['0'..'9'])) "42foobar"
+        let expected = Just ("42", "foobar")
+        testCase "parseSome: parseNumber" $ assertEqual "ParseMany parse first digits" expected actual,
+    do
+        let actual = runParser (parseSome (parseAnyChar ['0'..'9'])) "foobar42"
+        let expected = Nothing
+        testCase "parseSome: parse number when none" $ assertEqual "parseSome parse first digits" expected actual,
+    do
+        let actual = runParser parseInt "123 ,456" 
+        let expected = Just (123, " ,456")
+        testCase "parseInt: parse first number" $ assertEqual "parseInt parse first digits" expected actual,
+    do
+        let actual = runParser parseWord "1 2"
+        let expected = Just ("1", " 2")
+        testCase "parseWord: parse first word" $ assertEqual "parse first word" expected actual,
+    do
+        let actual = runParser parseWord "  Hello  "
+        let expected = Nothing
+        testCase "parseWord: no word in first place" $ assertEqual "returns nothing" expected actual
     ]
-
-
--- case_parseAndWith_example_1 :: Assertion
--- case_parseAndWith_example_1 = assertEqual "Example 1" expected actual
---     where
---         actual = runParser (parseAndWith (\ x y -> [x,y]) (parseChar 'a') (parseChar 'b')) "abcd"
---         expected = Just ("ab", "cd")
-
--- case_parseMany_example_1 :: Assertion
--- case_parseMany_example_1 = assertEqual "Example 1" expected actual
---     where
---         actual = runParser (parseMany (parseChar ' ')) "  foobar"
---         expected = Just ("  ", "foobar")
-
--- case_parseMany_example_2 :: Assertion
--- case_parseMany_example_2 = assertEqual "Example 2" expected actual
---     where
---         actual = runParser (parseMany (parseChar ' ')) "foobar  "
---         expected = Just ("", "foobar  ")
-
--- case_parseSome_example_1 :: Assertion
--- case_parseSome_example_1 = assertEqual "Example 1" expected actual
---     where
---         actual = runParser (parseSome (parseAnyChar ['0'..'9'])) "42foobar"
---         expected = Just ("42", "foobar")
-
--- case_parseSome_example_2 :: Assertion
--- case_parseSome_example_2 = assertEqual "Example 2" expected actual
---     where
---         actual = runParser (parseSome (parseAnyChar ['0'..'9'])) "foobar42"
---         expected = Nothing
-
--- case_parseInt_example :: Assertion
--- case_parseInt_example = assertEqual "Example 1" expected actual
---     where
---         actual  = runParser parseInt "123 ,456" 
---         expected = Just (123, " ,456")
-
--- case_parseWord :: Assertion
--- case_parseWord = assertEqual "Example 1" expected actual
---     where 
---       expected = Just ("1", " 2")
---       actual = runParser parseWord "1 2"
-
--- case_parseWord_frontSpace :: Assertion
--- case_parseWord_frontSpace = assertEqual "Example 1" expected actual
---     where 
---       expected = Nothing
---       actual = runParser parseWord "  Hello  "

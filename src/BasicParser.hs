@@ -1,4 +1,4 @@
-module Parser where
+module BasicParser where
 
 import Data.Maybe (isNothing)
 import Text.Read

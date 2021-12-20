@@ -1,6 +1,6 @@
-module TestParser where
+module TestBasicParser where
 
-import Parser
+import BasicParser
 import Test.HUnit (Assertion, assertEqual, Testable (test), (@=?), (~=?))
 import Test.Framework (Test, testGroup)
 import Test.Framework.Providers.HUnit (testCase)

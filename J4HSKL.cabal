@@ -25,8 +25,8 @@ source-repository head
 
 library
   exposed-modules:
+      BasicParser
       J4HSKL
-      Parser
   other-modules:
       Paths_J4HSKL
   hs-source-dirs:
@@ -39,7 +39,7 @@ test-suite J4HSKL-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
-      TestParser
+      TestBasicParser
       Paths_J4HSKL
   hs-source-dirs:
       tests

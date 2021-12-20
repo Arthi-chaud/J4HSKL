@@ -94,19 +94,17 @@ parseAnyChar needles = Parser anyCharParser
 
 -- | Calls '<&>' and applies 'func' on the result
 parseAndWith :: (a -> b -> c) -> Parser a -> Parser b -> Parser c
-parseAndWith func p1 p2 = Parser (\s -> do
+parseAndWith func p1 p2 = Parser $ \s -> do
         ((a, b), rest) <- runParser (p1 <&> p2) s
         Just (func a b, rest)
-    )
 
 -- | While 'p' doesn't returns 'Nothing', it is called on the rest
 -- Returns an array of parsed values. Never returns 'Nothing'
 parseMany :: Parser a -> Parser [a]
-parseMany p = Parser {runParser = \s ->
+parseMany p = Parser $ \s ->
     case runParser p s of
         Nothing -> Just ([], s)
         Just (p1, rest) -> runParser ((\p2 -> p1 : p2) <$> parseMany p) rest
-    }
 
 -- | While 'p' doesn't returns 'Nothing', it is called on the rest
 -- Returns an array of parsed values. Returns 'Nothing' if the array is empty
@@ -115,8 +113,7 @@ parseSome p1 = (\(a,b) -> a:b) <$> (p1 <&> parseMany p1)
 
 -- | Parse unsigned integer from string
 parseUInt :: Parser Integer
-parseUInt = Parser $ \string ->
-    runParser (read <$> parseSome (parseAnyChar ['0'..'9'])) string
+parseUInt = read <$> parseSome (parseAnyChar ['0'..'9'])
 
 -- | Parse signed integer from string
 parseInt :: Parser Integer
@@ -128,29 +125,28 @@ parseInt = Parser intParser
             runParser ((\nb-> nb * ((-1) ^ length signs)) <$> parseUInt) rest
 
 -- | Extract what's in the parenthesis
-parseParenthesis :: Parser String
-parseParenthesis = Parser $ \s -> do
+parseParenthesis :: (Char, Char) -> Parser String
+parseParenthesis (begin, end) = Parser $ \s -> do
     (_, str) <- runParser parseWhitespaces s
-    res <- extractParenthesis str 0
-    case res of
-        ('(':parsed, rest) -> Just (init parsed, rest)
-        _ -> Nothing
+    (parsed, rest) <- extractParenthesis str 0
+    if not (null parsed) && head parsed == begin then Just (tail(init parsed), rest)
+    else Nothing
     where
-        extractParenthesis ::  String -> Int -> Maybe (String, String)
+        extractParenthesis :: String -> Int -> Maybe (String, String)
         extractParenthesis [] 0 = Just ([], [])
         extractParenthesis [] _ = Nothing
-        extractParenthesis (')':rest) 0 = Nothing
-        extractParenthesis ('(':rest) 0 =  do
+        extractParenthesis (c:rest) 0 | c == end = Nothing 
+                                      | c == begin = do
                 (parsed, newRest) <- extractParenthesis rest 1
-                return ('(':parsed, newRest)
-        extractParenthesis (c:rest) 0 = Just ("", c:rest)
+                return (begin:parsed, newRest)
+                                      | otherwise = Just ("", c:rest)
         extractParenthesis (c:rest) depth = if depth < 0 then Nothing else do
                 (parsed, newRest) <- extractParenthesis rest (depth + getDepthOffset c)
                 return (c:parsed, newRest)
         getDepthOffset :: Char -> Int
-        getDepthOffset '(' = 1
-        getDepthOffset ')' = -1
-        getDepthOffset _ = 0
+        getDepthOffset c | c == begin = 1
+                         | c == end = -1
+                         | otherwise = 0
 
 
 

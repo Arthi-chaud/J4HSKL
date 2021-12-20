@@ -153,19 +153,23 @@ testSuite = testGroup "Parser module" [
         let expected = Just("", "")
         testCase "parseWhiteSpaces, empty string" $ expected @=? actual,
     do
-        let actual = runParser parseParenthesis  "()hello"
+        let actual = runParser (parseParenthesis ('(', ')')) "()hello"
         let expected = Just("", "hello")
         testCase "parseParenthesis, empty content" $ expected @=? actual,
     do
-        let actual = runParser parseParenthesis  "(hello1)hello2"
+        let actual = runParser (parseParenthesis ('{', '}')) "{hello1}hello2"
         let expected = Just("hello1", "hello2")
         testCase "parseParenthesis, string content" $ expected @=? actual,
     do
-        let actual = runParser parseParenthesis  "(hello1(1))hello2"
-        let expected = Just("hello1(1)", "hello2")
+        let actual = runParser (parseParenthesis ('[', ']')) "[hello1[1]]hello2"
+        let expected = Just("hello1[1]", "hello2")
         testCase "parseParenthesis, nested content" $ expected @=? actual,
     do
-        let actual = runParser parseParenthesis  "hello2(hello1(1))"
+        let actual = runParser (parseParenthesis ('[', ']')) "hello1[1]]hello2"
+        let expected = Nothing
+        testCase "parseParenthesis, impaired content" $ expected @=? actual,
+    do
+        let actual = runParser (parseParenthesis ('(', ')')) "hello2(hello1(1))"
         let expected = Nothing
         testCase "parseParenthesis, not parenthesis" $ expected @=? actual
     -- do

@@ -1,15 +1,27 @@
+
+{-|
+Module      : Basic Parser
+Description : Primitive Monadic Parser
+Copyright   : (c) Arthui-chaud, 2021
+License     : GPL-3
+Maintainer  : arthur.jamet@gmail.com
+Stability   : experimental
+Portability : POSIX
+
+-}
+
 module BasicParser where
 
 import Data.Maybe (isNothing)
 import Text.Read
 import Data.Char
-import Control.Applicative ( Alternative, (<|>), empty, some )
+import Control.Applicative ( Alternative, (<|>), empty, some)
 
 -- | A 'ParserFunction' function take a string a parameter,
--- maybe returns a successfull value of type 'a' tuppled with a string (the rest of the string)
+-- maybe returns a successfull value of type "a" tuppled with a string (the rest of the string)
 type ParserFunction a = String -> Maybe (a, String)
 
--- | A 'Parser' of type 'a' holds a 'ParserFunction' of same type.
+-- | A 'Parser' of type "a" holds a 'ParserFunction' of same type.
 data Parser a = Parser {
     runParser :: ParserFunction a
 }
@@ -45,14 +57,14 @@ instance Alternative Parser where
 
 instance Monad Parser where
     return = pure
-    -- | Calls 'parser2' using what 'parser1' parsed
+    -- | Calls "parser2" using what "parser1" parsed
     (>>=) parser1 parser2 = Parser (\s -> do
         (x,rest) <- runParser parser1 s
         runParser (parser2 x) rest
         )
 
--- | Calls 'parser1' and calls 'parser2' on what 'parser1' didn't parse
--- and returns a tupple of 'parser1' and 'parser2'
+-- | Calls "parser1" and calls "parser2" on what "parser1" didn't parse
+-- and returns a tupple of "parser1" and "parser2"
 (<&>) :: Parser a -> Parser b -> Parser (a, b)
 (<&>) p1 p2 = Parser (\s -> do
             (c1, rest) <- runParser p1 s
@@ -61,8 +73,8 @@ instance Monad Parser where
     )
 
 (<%>) :: Parser String -> Parser a -> Parser a
--- | Calls 'p1', and passing 'p2' the parsed value.
--- Returns the result of 'p2'
+-- | Calls "p1", and passing "p2" the parsed value.
+-- Returns the result of "p2"
 p1 <%> p2 = Parser (\s -> do
     (parsed1, rest1) <- runParser p1 s
     (parsed2, rest2) <- runParser p2 parsed1
@@ -92,13 +104,13 @@ parseAnyChar needles = Parser anyCharParser
             | otherwise = Nothing
 
 
--- | Calls '<&>' and applies 'func' on the result
+-- | Calls '<&>' and applies "func" on the result
 parseAndWith :: (a -> b -> c) -> Parser a -> Parser b -> Parser c
 parseAndWith func p1 p2 = Parser $ \s -> do
         ((a, b), rest) <- runParser (p1 <&> p2) s
         Just (func a b, rest)
 
--- | While 'p' doesn't returns 'Nothing', it is called on the rest
+-- | While "p" doesn't returns 'Nothing', it is called on the rest
 -- Returns an array of parsed values. Never returns 'Nothing'
 parseMany :: Parser a -> Parser [a]
 parseMany p = Parser $ \s ->
@@ -106,7 +118,7 @@ parseMany p = Parser $ \s ->
         Nothing -> Just ([], s)
         Just (p1, rest) -> runParser ((\p2 -> p1 : p2) <$> parseMany p) rest
 
--- | While 'p' doesn't returns 'Nothing', it is called on the rest
+-- | While "p" doesn't returns 'Nothing', it is called on the rest
 -- Returns an array of parsed values. Returns 'Nothing' if the array is empty
 parseSome :: Parser a -> Parser [a]
 parseSome p1 = (\(a,b) -> a:b) <$> (p1 <&> parseMany p1)

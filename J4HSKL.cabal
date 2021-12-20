@@ -27,6 +27,7 @@ library
   exposed-modules:
       BasicParser
       J4HSKL
+      J4HSKL.Data
   other-modules:
       Paths_J4HSKL
   hs-source-dirs:

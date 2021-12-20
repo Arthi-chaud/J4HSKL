@@ -1,6 +1,3 @@
-module J4HSKL (parseJson) where
+module J4HSKL where
 
-import GHC.Maybe
-
-parseJson :: String -> Maybe String
-parseJson _ = Nothing
+import J4HSKL.Data

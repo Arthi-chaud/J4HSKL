@@ -7,7 +7,6 @@ License     : GPL-3
 Maintainer  : arthur.jamet@gmail.com
 Stability   : experimental
 Portability : POSIX
-
 -}
 
 module BasicParser where

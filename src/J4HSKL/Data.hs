@@ -10,6 +10,10 @@ Portability : POSIX
 -}
 module J4HSKL.Data where
 
+
+import Text.Printf(printf)
+import Data.List (intercalate)
+
 -- | Defines types of JSON Values
 data JSONValue = Null
                | Bool JSONBool
@@ -18,11 +22,22 @@ data JSONValue = Null
                | Array JSONArray
                | Object JSONObject
 
+
+instance Show JSONValue where
+    show Null = "null"
+    show (Bool v) | v = "true"
+                  | otherwise = "false"
+    show (Number v) = show v
+    show (String v) = printf "\"%s\"" v
+    show (Array v) = printf "[%s]" (intercalate ", " $ map show v)
+    show (Object v) = printf "{%s}" (intercalate ", " $ map show v)
+
+
 -- | Boolean for JSON
 type JSONBool = Bool
 
 -- | Number for JSON
-data JSONNumber = Integer
+type JSONNumber = Integer
 
 -- | String for JSON
 type JSONString = String 
@@ -31,7 +46,9 @@ type JSONString = String
 type JSONArray = [JSONValue]
 
 -- | Pair for JSON (only used in object, never as standalone)
-type JSONPair = (JSONString, JSONValue)
+newtype JSONPair = Pair (JSONString, JSONValue)
+instance Show JSONPair where
+    show (Pair (key, value)) = printf "%s: %s" (show key) $ show value
 
 -- | JSON's Object
 type JSONObject = [JSONPair]

@@ -127,40 +127,34 @@ parseInt = Parser intParser
             (signs, rest) <- runParser (parseMany (parseChar '-')) s
             runParser ((\nb-> nb * ((-1) ^ length signs)) <$> parseUInt) rest
 
--- | Parse whitespacesfrom string
-parseWhiteSpaces :: Parser String
-parseWhiteSpaces = parseMany (parseAnyChar " \t")
-
--- Extracting parenthesis
-
-_getDepthOffset :: Char -> Int
-_getDepthOffset '(' = 1
-_getDepthOffset ')' = -1
-_getDepthOffset _ = 0
-
--- If the string doesnt start by parenthesis, returns nothing
-_extractParenthesis ::  String -> Int -> Maybe (String, String)
-_extractParenthesis [] 0 = Just ([], [])
-_extractParenthesis [] _ = Nothing
-_extractParenthesis (')':rest) 0 = Nothing
-_extractParenthesis ('(':rest) 0 =  do
-        (parsed, newRest) <- _extractParenthesis rest 1
-        return ('(':parsed, newRest)
-_extractParenthesis (c:rest) 0 = Just ("", c:rest)
-_extractParenthesis (c:rest) depth = if depth < 0 then Nothing else do
-        (parsed, newRest) <- _extractParenthesis rest (depth + _getDepthOffset c)
-        return (c:parsed, newRest)
-
+-- | Extract what's in the parenthesis
 parseParenthesis :: Parser String
 parseParenthesis = Parser $ \s -> do
-    (_, str) <- runParser parseWhiteSpaces s
-    res <- _extractParenthesis str 0
+    (_, str) <- runParser parseWhitespaces s
+    res <- extractParenthesis str 0
     case res of
         ('(':parsed, rest) -> Just (init parsed, rest)
         _ -> Nothing
+    where
+        extractParenthesis ::  String -> Int -> Maybe (String, String)
+        extractParenthesis [] 0 = Just ([], [])
+        extractParenthesis [] _ = Nothing
+        extractParenthesis (')':rest) 0 = Nothing
+        extractParenthesis ('(':rest) 0 =  do
+                (parsed, newRest) <- extractParenthesis rest 1
+                return ('(':parsed, newRest)
+        extractParenthesis (c:rest) 0 = Just ("", c:rest)
+        extractParenthesis (c:rest) depth = if depth < 0 then Nothing else do
+                (parsed, newRest) <- extractParenthesis rest (depth + getDepthOffset c)
+                return (c:parsed, newRest)
+        getDepthOffset :: Char -> Int
+        getDepthOffset '(' = 1
+        getDepthOffset ')' = -1
+        getDepthOffset _ = 0
 
 
--- | Parse anything that is a whitespace
+
+-- | Parse anything that is a whitespace (using 'isSpace')
 parseWhitespaces :: Parser String
 parseWhitespaces = parseWhile isSpace
     where

@@ -97,6 +97,10 @@ testSuite = testGroup "Parser module" [
         let expected = Just (123, " ,456")
         testCase "parseInt: parse first number" $ expected @=? actual,
     do
+        let actual = runParser parseInt "-123, 456" 
+        let expected = Just (-123, ", 456")
+        testCase "parseInt: parse negative number" $ expected @=? actual,
+    do
         let actual = runParser parseWord "1 2"
         let expected = Just ("1", " 2")
         testCase "parseWord: parse first word" $ expected @=? actual,
@@ -139,7 +143,31 @@ testSuite = testGroup "Parser module" [
     do
         let actual = runParser parseWord ""
         let expected = Nothing
-        testCase "parseWord, empty string" $ expected @=? actual
+        testCase "parseWord, empty string" $ expected @=? actual,
+    do
+        let actual = runParser parseWhitespaces "  \n\t  hello"
+        let expected = Just("  \n\t  ", "hello")
+        testCase "parseWhiteSpaces" $ expected @=? actual,
+    do
+        let actual = runParser parseWhitespaces ""
+        let expected = Just("", "")
+        testCase "parseWhiteSpaces, empty string" $ expected @=? actual,
+    do
+        let actual = runParser parseParenthesis  "()hello"
+        let expected = Just("", "hello")
+        testCase "parseParenthesis, empty content" $ expected @=? actual,
+    do
+        let actual = runParser parseParenthesis  "(hello1)hello2"
+        let expected = Just("hello1", "hello2")
+        testCase "parseParenthesis, string content" $ expected @=? actual,
+    do
+        let actual = runParser parseParenthesis  "(hello1(1))hello2"
+        let expected = Just("hello1(1)", "hello2")
+        testCase "parseParenthesis, nested content" $ expected @=? actual,
+    do
+        let actual = runParser parseParenthesis  "hello2(hello1(1))"
+        let expected = Nothing
+        testCase "parseParenthesis, not parenthesis" $ expected @=? actual
     -- do
     --     let actual = runParser empty "Hello"
     --     let expected = Nothing

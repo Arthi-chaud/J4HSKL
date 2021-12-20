@@ -153,25 +153,25 @@ testSuite = testGroup "Parser module" [
         let expected = Just("", "")
         testCase "parseWhiteSpaces, empty string" $ expected @=? actual,
     do
-        let actual = runParser (parseParenthesis ('(', ')')) "()hello"
+        let actual = runParser (parseScope ('(', ')')) "()hello"
         let expected = Just("", "hello")
-        testCase "parseParenthesis, empty content" $ expected @=? actual,
+        testCase "parseScope, empty content" $ expected @=? actual,
     do
-        let actual = runParser (parseParenthesis ('{', '}')) "{hello1}hello2"
+        let actual = runParser (parseScope ('{', '}')) "{hello1}hello2"
         let expected = Just("hello1", "hello2")
-        testCase "parseParenthesis, string content" $ expected @=? actual,
+        testCase "parseScope, string content" $ expected @=? actual,
     do
-        let actual = runParser (parseParenthesis ('[', ']')) "[hello1[1]]hello2"
+        let actual = runParser (parseScope ('[', ']')) "[hello1[1]]hello2"
         let expected = Just("hello1[1]", "hello2")
-        testCase "parseParenthesis, nested content" $ expected @=? actual,
+        testCase "parseScope, nested content" $ expected @=? actual,
     do
-        let actual = runParser (parseParenthesis ('[', ']')) "hello1[1]]hello2"
+        let actual = runParser (parseScope ('[', ']')) "hello1[1]]hello2"
         let expected = Nothing
-        testCase "parseParenthesis, impaired content" $ expected @=? actual,
+        testCase "parseScope, impaired content" $ expected @=? actual,
     do
-        let actual = runParser (parseParenthesis ('(', ')')) "hello2(hello1(1))"
+        let actual = runParser (parseScope ('(', ')')) "hello2(hello1(1))"
         let expected = Nothing
-        testCase "parseParenthesis, not parenthesis" $ expected @=? actual
+        testCase "parseScope, not parenthesis" $ expected @=? actual
     -- do
     --     let actual = runParser empty "Hello"
     --     let expected = Nothing

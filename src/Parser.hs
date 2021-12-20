@@ -125,8 +125,8 @@ parseInt = Parser intParser
             runParser ((\nb-> nb * ((-1) ^ length signs)) <$> parseUInt) rest
 
 -- | Extract what's in the parenthesis
-parseParenthesis :: (Char, Char) -> Parser String
-parseParenthesis (begin, end) = Parser $ \s -> do
+parseScope :: (Char, Char) -> Parser String
+parseScope (begin, end) = Parser $ \s -> do
     (_, str) <- runParser parseWhitespaces s
     (parsed, rest) <- extractParenthesis str 0
     if not (null parsed) && head parsed == begin then Just (tail(init parsed), rest)

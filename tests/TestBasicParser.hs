@@ -7,7 +7,7 @@ import Test.Framework.Providers.HUnit (testCase)
 import Control.Applicative ( Alternative, (<|>), empty )
 
 testSuite :: Test
-testSuite = testGroup "Parser module" [
+testSuite = testGroup "Basic Parser module" [
     do
         let actual = runParser (parseChar 'a') "abcd"
         let expected = Just ('a', "bcd")

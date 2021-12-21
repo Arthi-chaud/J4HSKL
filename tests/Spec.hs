@@ -6,6 +6,7 @@ import Assets (loadTestAssets)
 
 main :: IO ()
 main = do
-    defaultMain [ TestBasicParser.testSuite ]
+    testAssets <- Assets.loadTestAssets 
+    defaultMain [ TestBasicParser.testSuite, TestJ4HSKL.Parser.testSuite testAssets ]
 
     

@@ -15,12 +15,13 @@ import Text.Printf(printf)
 import Data.List (intercalate)
 
 -- | Defines types of JSON Values
-data JSONValue = Null
-               | Bool JSONBool
-               | Number JSONNumber
-               | String JSONString
-               | Array JSONArray
-               | Object JSONObject
+data JSONValue = 
+    Null -- ^ 
+   | Bool Bool -- ^ Boolean for JSON
+   | Number Integer -- ^ Number for JSON
+   | String String -- ^ String for JSON
+   | Array [JSONValue] -- ^ Array for JSON
+   | Object [JSONPair] -- ^ JSON's Object
 
 
 instance Show JSONValue where
@@ -32,23 +33,18 @@ instance Show JSONValue where
     show (Array v) = printf "[%s]" (intercalate ", " $ map show v)
     show (Object v) = printf "{%s}" (intercalate ", " $ map show v)
 
-
--- | Boolean for JSON
-type JSONBool = Bool
-
--- | Number for JSON
-type JSONNumber = Integer
-
--- | String for JSON
-type JSONString = String 
-
--- | Array for JSON
-type JSONArray = [JSONValue]
+instance Eq JSONValue where
+    (==) Null Null = True
+    (==) (Bool a) (Bool b) = a == b
+    (==) (Number a) (Number b) = a == b
+    (==) (String a) (String b) = a == b
+    (==) (Array a) (Array b) = a == b
+    (==) (Object a) (Object b) = a == b
+    (==) _ _ = False
 
 -- | Pair for JSON (only used in object, never as standalone)
-newtype JSONPair = Pair (JSONString, JSONValue)
+newtype JSONPair = Pair (String, JSONValue)
 instance Show JSONPair where
     show (Pair (key, value)) = printf "%s: %s" (show key) $ show value
-
--- | JSON's Object
-type JSONObject = [JSONPair]
+instance Eq JSONPair where
+    (==) (Pair (key1, value1)) (Pair (key2, value2)) = key1 == key2 && value1 == value2

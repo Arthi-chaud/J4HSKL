@@ -7,6 +7,7 @@ import Assets (loadTestAssets)
 main :: IO ()
 main = do
     testAssets <- Assets.loadTestAssets 
+    traceIO $ show (map (\asset-> fst asset) (fst testAssets))
     defaultMain [ TestBasicParser.testSuite, TestJ4HSKL.Parser.testSuite testAssets ]
 
     

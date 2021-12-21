@@ -1,6 +1,7 @@
 module Assets where
 
 import System.Directory(getDirectoryContents)
+import Data.List (sortBy)
 
 type FileContent = String
 type TestAsset = (FilePath, FileContent)
@@ -19,7 +20,8 @@ loadTestAssetsFromFolder :: FilePath -> IO [TestAsset]
 loadTestAssetsFromFolder assetsFolder = do
     directoryContent <- getDirectoryContents assetsFolder
     let assetsFiles = filter (\name -> head name /= '.') directoryContent
-    loadTestAssetsFromFiles (map (assetsFolder ++) assetsFiles)
+    assets <- loadTestAssetsFromFiles (map (assetsFolder ++) assetsFiles)
+    return (sortBy (\a b -> compare (fst a) (fst b)) assets)
 
 loadTestAssetsFromFiles :: [FilePath] -> IO [TestAsset]
 loadTestAssetsFromFiles [] = return []

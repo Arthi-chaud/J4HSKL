@@ -35,6 +35,7 @@ tests:
     - -with-rtsopts=-N
     dependencies:
     - J4HSKL
+    - directory
     - HUnit
     - test-framework
     - test-framework-hunit

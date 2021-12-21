@@ -1,7 +1,13 @@
-import TestBasicParser (testSuite)
-import Test.HUnit (Assertion, assertEqual, Testable (test))
-import Test.Framework (Test, testGroup, defaultMain)
-import Test.Framework.Providers.HUnit (testCase)
+import Test.Framework (defaultMain)
+import TestBasicParser
+import TestJ4HSKL.Parser
+import System.Directory
+import Debug.Trace
+
 main :: IO ()
-main = defaultMain
-    [ TestBasicParser.testSuite ]
+main = do
+    assetsFolders <- getDirectoryContents "tests/assets"
+    assetsFolders = filter (\name -> head name /= '.') assetsFolders
+    defaultMain [ TestBasicParser.testSuite ]
+
+    

@@ -1,4 +1,4 @@
-module TestJ4HSKLPArser where
+module TestJ4HSKL.Parser where
 
 import J4HSKL.Parser
 import Test.HUnit (Assertion, assertEqual, Testable (test), (@=?), (~=?))

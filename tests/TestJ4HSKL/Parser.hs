@@ -40,7 +40,7 @@ testSuite (validAssets, invalidAssets) = testGroup "JSON Parser module" (testsOn
             testValidAsset validAssets "number_exposed_positive" $ Just (Number (30 ^ 2), ""),
             testValidAsset validAssets "number_exposed_uppercase" $ Just (Number (10 ^ 34), ""),
             testValidAsset validAssets "number_float_exposed" $ Just (Number (3 ^ 2), ""),
-            testValidAsset validAssets "number_float_exposed_negative" $ Just (Number (123.45678 ^ (-10)), ""),
+            testValidAsset validAssets "number_float_exposed_negative" $ Just (Number (123.45678 ** (-10)), ""),
             testValidAsset validAssets "number_float" $ Just (Number 123.45678, ""),
             testValidAsset validAssets "number" $ Just (Number 3, ""),
             testValidAsset validAssets "number_negative" $ Just (Number(-123), ""),
@@ -69,14 +69,13 @@ testSuite (validAssets, invalidAssets) = testGroup "JSON Parser module" (testsOn
             testValidAsset validAssets "string_escaped_backspace" $ Just (String "\bWorld", ""),
             testValidAsset validAssets "string_escaped_carriage_return" $ Just (String "Hello\rWorld", ""),
             testValidAsset validAssets "string_escaped_formfeed" $ Just (String "123\f123", ""),
-            testValidAsset validAssets "string_escaped_hex_five" $ Just (String "Hello\uABCDEWorld", ""),
-            testValidAsset validAssets "string_escaped_hex" $  Just (String "Hello\uA2aeWorld", ""),
-            testValidAsset validAssets "string_escaped_hex_zeros" $ Just (String "Hello\u0000World", ""),
+            testValidAsset validAssets "string_escaped_hex_five" $ Just (String (printf "Hello%cEWorld" (0xabcd :: Int)), ""),
+            testValidAsset validAssets "string_escaped_hex" $ Just (String (printf "Hello%cWorld" (0xA2ae :: Int)), ""),
+            testValidAsset validAssets "string_escaped_hex_zeros" $ Just (String (printf "Hello%cWorld" (0x0000 :: Int)), ""),
             testValidAsset validAssets "string_escaped_newline" $ Just (String "Hello\nWorld", ""),
             testValidAsset validAssets "string_escaped_quote" $ Just (String "Hello\"World", ""),
-            testValidAsset validAssets "string_escaped_slash" $ Just (String "Hello\/World", ""),
+            testValidAsset validAssets "string_escaped_slash" $ Just (String "Hello/World", ""),
             testValidAsset validAssets "string" $ Just (String "Hello World", ""),
             testValidAsset validAssets "true" $ Just (Bool True, ""),
-            -- | To do
             testValidAsset validAssets "nested" $ Just (Null, "")
             ]

@@ -18,7 +18,7 @@ import Data.List (intercalate)
 data JSONValue = 
     Null -- ^ 
    | Bool Bool -- ^ Boolean for JSON
-   | Number Integer -- ^ Number for JSON
+   | Number Float  -- ^ Number for JSON
    | String String -- ^ String for JSON
    | Array [JSONValue] -- ^ Array for JSON
    | Object [JSONPair] -- ^ JSON's Object

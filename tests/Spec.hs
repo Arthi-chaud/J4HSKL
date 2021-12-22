@@ -9,8 +9,8 @@ main = do
     testAssets <- Assets.loadTestAssets
     defaultMain [ 
         TestBasicParser.testSuite,
-        TestJ4HSKL.Data.testSuite
-        --TestJ4HSKL.Parser.testSuite testAssets 
+        TestJ4HSKL.Data.testSuite,
+        TestJ4HSKL.Parser.testSuite testAssets 
         ]
 
     

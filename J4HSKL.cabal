@@ -6,7 +6,7 @@ cabal-version: 1.12
 
 name:           J4HSKL
 version:        0.1.0.0
-description:    Please see the README on GitHub at <https://github.com/Arthi-chaud/J4HSKL#readme>
+description:    Manage & export JSON data
 homepage:       https://github.com/Arthi-chaud/J4HSKL#readme
 bug-reports:    https://github.com/Arthi-chaud/J4HSKL/issues
 author:         Arthi-chaud

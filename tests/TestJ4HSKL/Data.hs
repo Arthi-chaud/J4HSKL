@@ -101,6 +101,30 @@ testSuite = testGroup "JSON Data module" [
         let expected ="2e2"
         testCase "Show JSON Number: Exposed to Float (invalid JSON -> converts to integer)" $ expected @=? actual,
     do
+        let actual = show $ Array []
+        let expected ="[]"
+        testCase "Show JSON Array: Empty" $ expected @=? actual,
+    do
+        let actual = show $ Array [String "Hello World"]
+        let expected ="[\"Hello World\"]"
+        testCase "Show JSON Array: One String" $ expected @=? actual,
+    do
+        let actual = show $ Array [Bool False ]
+        let expected ="[false]"
+        testCase "Show JSON Array: One Bool" $ expected @=? actual,
+    do
+        let actual = show $ Array [Number 1, Number 2, Number 3]
+        let expected ="[1, 2, 3]"
+        testCase "Show JSON Array: Three Elements" $ expected @=? actual,
+    do
+        let actual = show $ Array [Number 1, Number 2.3, Number 3]
+        let expected ="[1, 2.3, 3]"
+        testCase "Show JSON Array: Three Elements - mixed numbers " $ expected @=? actual,
+    do
+        let actual = show $ Array [Bool True, Number 2.3, String "J\"4\"HSKL", Null]
+        let expected ="[true, 2.3, \"J\\\"4\\\"HSKL\", null]"
+        testCase "Show JSON Array: Three Elements - mixed types " $ expected @=? actual,
+    do
         let actual = show $ Bool True
         let expected ="true"
         testCase "Show JSON Bool: true" $ expected @=? actual,

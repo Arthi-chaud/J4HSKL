@@ -13,6 +13,7 @@ module J4HSKL.Data where
 
 import Text.Printf(printf)
 import Data.List (intercalate)
+import Data.Char (isSpace, showLitChar)
 
 -- | Defines types of JSON Values
 data JSONValue = 
@@ -29,7 +30,7 @@ instance Show JSONValue where
     show (Bool v) | v = "true"
                   | otherwise = "false"
     show (Number v) = show v
-    show (String v) = printf "\"%s\"" v
+    show (String v) = printf "\"%s\"" $ showJSONString v
     show (Array v) = printf "[%s]" (intercalate ", " $ map show v)
     show (Object v) = printf "{%s}" (intercalate ", " $ map show v)
 
@@ -48,3 +49,7 @@ instance Show JSONPair where
     show (Pair (key, value)) = printf "%s: %s" (show key) $ show value
 instance Eq JSONPair where
     (==) (Pair (key1, value1)) (Pair (key2, value2)) = key1 == key2 && value1 == value2
+
+showJSONString :: String -> String
+showJSONString "" = ""
+showJSONString (char:rest) = showLitChar char $ showJSONString rest

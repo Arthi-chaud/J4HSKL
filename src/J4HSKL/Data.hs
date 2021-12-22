@@ -14,6 +14,7 @@ module J4HSKL.Data where
 import Text.Printf(printf)
 import Data.List (intercalate)
 import Data.Char (isSpace, showLitChar)
+import BasicParser
 
 -- | Defines types of JSON Values
 data JSONValue = 
@@ -52,8 +53,9 @@ instance Eq JSONPair where
 
 showJSONString :: String -> String
 showJSONString "" = ""
-showJSONString (char:rest) = 
-    if length litChar <= 2
+showJSONString (char:rest) =  case runParser (parseAnyChar "/\\\"") (char:rest) of
+    Just (c, rest) -> printf "\\%c%s" c $ showJSONString rest
+    Nothing -> if length litChar <= 2
     then litChar ++ showJSONString rest
     else (printf "\\u%04X" char) ++ showJSONString rest
     where

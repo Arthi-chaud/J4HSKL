@@ -18,13 +18,13 @@ testSuite (validAssets, invalidAssets) = testGroup "JSON Parser module" (testsOn
         getTestName assetPath = printf "parseJSON: %s" (map (\c -> if c == '_' then ' ' else c) (takeBaseName assetPath)) 
         
         testInvalidAsset :: TestAsset -> Test
-        testInvalidAsset (assetName, asset) = testCase (getTestName assetName) $ Nothing @=? (runParser parseJSON asset)
+        testInvalidAsset (assetName, asset) = testCase (getTestName assetName) $ Nothing @=? runParser parseJSON asset
         
         testValidAsset :: [TestAsset] -> String -> Maybe (JSONValue, String) -> Test
-        testValidAsset assets assetName expected = case find (\s -> (takeBaseName (fst s)) == assetName) assets of
+        testValidAsset assets assetName expected = case find (\s -> takeBaseName (fst s) == assetName) assets of
             Nothing -> testCase (getTestName assetName) $ assertFailure (printf "%s: No such asset" assetName) 
             Just (name, content) -> 
-                testCase (getTestName name) $ expected @=? (runParser parseJSON content)
+                testCase (getTestName name) $ expected @=? runParser parseJSON content
         
         testsOnInvalid = map testInvalidAsset invalidAssets
         

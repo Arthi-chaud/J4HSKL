@@ -15,6 +15,7 @@ import Text.Printf(printf)
 import Data.List (intercalate)
 import Data.Char (isSpace, showLitChar)
 import BasicParser
+import Numeric (showGFloatAlt)
 
 -- | Defines types of JSON Values
 data JSONValue = 
@@ -69,4 +70,4 @@ showJSONNumber number = case drop (strlen - 2) string of
     _ -> string
     where
         strlen = length string
-        string = show number
+        string = showGFloatAlt Nothing number ""

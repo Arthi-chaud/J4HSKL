@@ -6,6 +6,7 @@ import Test.Framework (Test, testGroup)
 import Test.Framework.Providers.HUnit (testCase)
 import Text.Printf (printf)
 
+
 testSuite :: Test
 testSuite = testGroup "JSON Data module" [
     do
@@ -81,25 +82,9 @@ testSuite = testGroup "JSON Data module" [
         let expected ="-12.3"
         testCase "Show JSON Number: negative float" $ expected @=? actual,
     do
-        let actual = show $ Number (3 ^^(-10))
-        let expected ="3e-10"
-        testCase "Show JSON Number: Exposed to negative" $ expected @=? actual,
-    do
         let actual = show $ Number (10 ^^ 3)
-        let expected ="10e3"
+        let expected ="1000"
         testCase "Show JSON Number: Exposed to positive" $ expected @=? actual,
-    do
-        let actual = show $ Number (2.3 ^^ 10)
-        let expected ="2.3e10"
-        testCase "Show JSON Number: Exposed Float" $ expected @=? actual,
-    do
-        let actual = show $ Number (1.3 ^^ (-2))
-        let expected ="1.3e-2"
-        testCase "Show JSON Number: Exposed Float to negative" $ expected @=? actual,
-    do
-        let actual = show $ Number (2 ** 2.3)
-        let expected ="2e2"
-        testCase "Show JSON Number: Exposed to Float (invalid JSON -> converts to integer)" $ expected @=? actual,
     do
         let actual = show $ Array []
         let expected ="[]"

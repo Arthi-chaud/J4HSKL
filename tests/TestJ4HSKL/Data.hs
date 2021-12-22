@@ -22,7 +22,7 @@ testSuite = testGroup "JSON Data module" [
         testCase "Show JSON String: newline" $ expected @=? actual,
     do
         let actual = show $ String "\\J4HSKL\\"
-        let expected ="\"\\J4HSKL\\\""
+        let expected ="\"\\\\J4HSKL\\\\\""
         testCase "Show JSON String: backslash" $ expected @=? actual,
     do
         let actual = show $ String "\bTo\bto\b"

@@ -179,6 +179,13 @@ parseIf f = Parser $ \s -> case s of
         where
             first = head s
 
+-- | Run parser n times
+parseN :: Int -> Parser a -> Parser [a]
+parseN n p = Parser $ \s -> if n <= 0 then Just ([], s)
+    else do
+        (parsed, res) <- runParser p s
+        runParser ((parsed: ) <$> parseN (n - 1) p) res
+
 -- | Parse anything that is not a whitespace
 parseWord :: Parser String
 parseWord = some parseNotSpace

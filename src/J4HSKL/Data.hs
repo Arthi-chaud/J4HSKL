@@ -52,4 +52,9 @@ instance Eq JSONPair where
 
 showJSONString :: String -> String
 showJSONString "" = ""
-showJSONString (char:rest) = showLitChar char $ showJSONString rest
+showJSONString (char:rest) = 
+    if length litChar <= 2
+    then litChar ++ showJSONString rest
+    else (printf "\\u%04X" char) ++ showJSONString rest
+    where
+        litChar = showLitChar char ""

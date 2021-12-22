@@ -44,6 +44,7 @@ test-suite J4HSKL-test
   other-modules:
       Assets
       TestBasicParser
+      TestJ4HSKL.Data
       TestJ4HSKL.Parser
       Paths_J4HSKL
   hs-source-dirs:

@@ -125,6 +125,22 @@ testSuite = testGroup "JSON Data module" [
         let expected ="[true, 2.3, \"J\\\"4\\\"HSKL\", null]"
         testCase "Show JSON Array: Three Elements - mixed types " $ expected @=? actual,
     do
+        let actual = show $ Object []
+        let expected ="{}"
+        testCase "Show JSON Object: Empty" $ expected @=? actual,
+    do
+        let actual = show $ Object [Pair ("Key", String "Value")]
+        let expected ="{\"Key\": \"Value\"}"
+        testCase "Show JSON Object: One Pair" $ expected @=? actual,
+    do
+        let actual = show $ Object [Pair ("Key1", String "Value1"), Pair ("Key2", Number 2)]
+        let expected ="{\"Key1\": \"Value1\", \"Key2\": 2}"
+        testCase "Show JSON Object: Two Pairs - mixed types" $ expected @=? actual,
+    do
+        let actual = show $ Object [Pair ("Key1", Object [Pair ("Nested Key", Null)]), Pair ("Key2", Number 2)]
+        let expected ="{\"Key1\": {\"Nested Key\": null}, \"Key2\": 2}"
+        testCase "Show JSON Object: Nested Object" $ expected @=? actual,
+    do
         let actual = show $ Bool True
         let expected ="true"
         testCase "Show JSON Bool: true" $ expected @=? actual,

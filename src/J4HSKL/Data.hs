@@ -30,7 +30,7 @@ instance Show JSONValue where
     show Null = "null"
     show (Bool v) | v = "true"
                   | otherwise = "false"
-    show (Number v) = show v
+    show (Number v) = showJSONNumber v
     show (String v) = printf "\"%s\"" $ showJSONString v
     show (Array v) = printf "[%s]" (intercalate ", " $ map show v)
     show (Object v) = printf "{%s}" (intercalate ", " $ map show v)
@@ -51,6 +51,7 @@ instance Show JSONPair where
 instance Eq JSONPair where
     (==) (Pair (key1, value1)) (Pair (key2, value2)) = key1 == key2 && value1 == value2
 
+-- | Fromat String for JSON (without quotes)
 showJSONString :: String -> String
 showJSONString "" = ""
 showJSONString (char:rest) =  case runParser (parseAnyChar "/\\\"") (char:rest) of
@@ -60,3 +61,12 @@ showJSONString (char:rest) =  case runParser (parseAnyChar "/\\\"") (char:rest) 
     else (printf "\\u%04X" char) ++ showJSONString rest
     where
         litChar = showLitChar char ""
+
+-- | Format Number for JSON
+showJSONNumber :: Float -> String 
+showJSONNumber number = case drop (strlen - 2) string of
+    ".0" -> take (strlen - 2) string
+    _ -> string
+    where
+        strlen = length string
+        string = show number

@@ -74,11 +74,11 @@ testSuite = testGroup "JSON Data module" [
         testCase "Show JSON Number: positive float" $ expected @=? actual,
     do
         let actual = show $ Number (-12)
-        let expected ="123"
+        let expected ="-12"
         testCase "Show JSON Number: negative" $ expected @=? actual,
     do
         let actual = show $ Number (-12.3)
-        let expected ="12.3"
+        let expected ="-12.3"
         testCase "Show JSON Number: negative float" $ expected @=? actual,
     do
         let actual = show $ Number (3 ^^(-10))

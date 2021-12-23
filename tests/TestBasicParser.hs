@@ -5,6 +5,7 @@ import Test.HUnit (Assertion, assertEqual, Testable (test), (@=?), (~=?))
 import Test.Framework (Test, testGroup)
 import Test.Framework.Providers.HUnit (testCase)
 import Control.Applicative ( Alternative, (<|>), empty )
+import Data.Char (isSpace)
 
 testSuite :: Test
 testSuite = testGroup "Basic Parser module" [
@@ -132,6 +133,22 @@ testSuite = testGroup "Basic Parser module" [
         let actual = runParser parseWord "  Hello  "
         let expected = Nothing
         testCase "parseWord: no word in first place" $ expected @=? actual,
+    do
+        let actual = runParser (parseN 0 $ parseIf isSpace) "   hello"
+        let expected = Just ([], "   hello")
+        testCase "parseN, zero time" $ expected @=? actual,
+    do
+        let actual = runParser (parseN 1 $ parseIf isSpace) "   hello"
+        let expected = Just ([' '], "  hello")
+        testCase "parseN, once" $ expected @=? actual,
+    do
+        let actual = runParser (parseN 3 $ parseIf isSpace) "   hello"
+        let expected = Just ("   ", "hello")
+        testCase "parseN, three times" $ expected @=? actual,
+    do
+        let actual = runParser (parseN 5 $ parseIf isSpace) "   "
+        let expected = Nothing
+        testCase "parseN, more than available" $ expected @=? actual,
     do
         let actual = runParser (parseChar 'l' >>= parseChar) "llo"
         let expected = Just ('l', "o")

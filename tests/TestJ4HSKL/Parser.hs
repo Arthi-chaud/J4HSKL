@@ -36,7 +36,7 @@ testSuite (validAssets, invalidAssets) = testGroup "JSON Parser module" (testsOn
             testValidAsset validAssets "false" $ Just (Bool False, ""),
             testValidAsset validAssets "null" $ Just (Null, ""),
             testValidAsset validAssets "number_exposed" $ Just (Number (3 ^ 2), ""),
-            testValidAsset validAssets "number_exposed_negative" $ Just (Number (3 ^(-10)), ""),
+            testValidAsset validAssets "number_exposed_negative" $ Just (Number (3 ^^(-10)), ""),
             testValidAsset validAssets "number_exposed_positive" $ Just (Number (30 ^ 2), ""),
             testValidAsset validAssets "number_exposed_uppercase" $ Just (Number (10 ^ 34), ""),
             testValidAsset validAssets "number_float_exposed" $ Just (Number (3 ^ 2), ""),

@@ -70,10 +70,16 @@ instance Monad Parser where
             (c2, finalRest) <- runParser p2 rest
             Just((c1, c2), finalRest)
     )
+-- | XOR parser
+(<^>) p1 p2 = Parser $ \s -> case runParser p1 s of
+            Nothing -> runParser p2 s
+            res -> case runParser p2 s of
+                Nothing -> res 
+                _ -> Nothing
 
-(<%>) :: Parser String -> Parser a -> Parser a
 -- | Calls "p1", and passing "p2" the parsed value.
 -- Returns the result of "p2"
+(<%>) :: Parser String -> Parser a -> Parser a
 p1 <%> p2 = Parser (\s -> do
     (parsed1, rest1) <- runParser p1 s
     (parsed2, rest2) <- runParser p2 parsed1

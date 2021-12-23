@@ -185,6 +185,28 @@ testSuite = testGroup "Basic Parser module" [
         let actual = runParser (parseSome (parseAnyChar "1234") <%> parseChar '2') "1234lol"
         let expected = Nothing
         testCase "<%> second fail" $ expected @=? actual,
+
+    do
+        let actual = runParser (parseAnyChar "234" <^> parseChar '1') "1234lol"
+        let expected = Just ('1', "234lol")
+        testCase "<^> firstFail" $ expected @=? actual,
+
+    do
+        let actual = runParser (parseAnyChar "1234" <^> parseChar 'a') "1234lol"
+        let expected = Just ('1', "234lol")
+        testCase "<^> second Fail" $ expected @=? actual,
+
+    do
+        let actual = runParser (parseAnyChar "1234" <^> parseChar '1') "1234lol"
+        let expected = Nothing
+        testCase "<^> both succeed" $ expected @=? actual,
+
+    do
+        let actual = runParser (parseAnyChar "a234" <^> parseChar 'a') "1234lol"
+        let expected = Nothing
+        testCase "<^> both fail" $ expected @=? actual,
+
+
     do
         let actual = runParser parseWord "1234 lol"
         let expected = Just ("1234", " lol")

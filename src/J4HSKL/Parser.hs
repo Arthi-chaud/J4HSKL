@@ -16,7 +16,9 @@ import Text.Read (readMaybe)
 import Control.Applicative
 
 parseJSON :: Parser JSONValue
-parseJSON = parseJSONNumber <|> parseJSONNull <|> parseJSONBool
+parseJSON = parseJSONNumber
+        <|> parseJSONNull
+        <|> parseJSONBool
 
 -- | Parse null from JSON Data
 parseJSONNull :: Parser JSONValue
@@ -29,12 +31,21 @@ parseJSONBool = (Bool False <$ parseString "false") <|> (Bool True <$ parseStrin
 -- | Parse Number from JSON Data
 parseJSONNumber :: Parser JSONValue
 parseJSONNumber = Parser $ \s -> do
-    (number, rest) <- runParser parseFloat s
-    case runParser parseExponentString rest of
+    (number, rest) <- runParser parseNumber  s
+    if not (null rest) && head rest == '.'
+    then Nothing
+    else case runParser parseExponent rest of
         Nothing -> Just (Number number, rest)
-        Just (exponent, rest2) -> do
-            exposedNumber <- readMaybe (show number ++ exponent) :: Maybe Float
-            return (Number exposedNumber, rest2)
+        Just (exponent, rest2) -> if not (null rest2) && head rest2 == '.'
+            then Nothing
+            else return (Number $ fromInteger exponent, rest2)
+
     where
-        parseExponentString = uncurry (:) <$> (parseAnyChar "eE" <&> parseExponentNumberString)
-        parseExponentNumberString = uncurry (:) <$> (parseIf (`elem` "-+") <&> (show <$> parseInt))
+        parseNumber = parseLeadingZero <^> (parseFloat <|> (fromInteger <$> parseInt))
+        parseLeadingZero =  0 <$ parseChar '0'
+        parseExponent = parseAnyChar "eE" *> parseExponentNumber
+        parseExponentSign = parseAnyChar "-+" <|> pure '+'
+        parseExponentNumber = uncurry applySign <$> (parseExponentSign  <&> parseUInt)
+        applySign :: Char -> Integer -> Integer
+        applySign '-' nb = nb * (-1)
+        applySign _ nb = nb

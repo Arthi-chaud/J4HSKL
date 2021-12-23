@@ -86,21 +86,14 @@ parseChar :: Char -> Parser Char
 parseChar expected = Parser charParser
     where
         charParser :: ParserFunction Char
-        charParser s
-            | null s = Nothing
-            | head s == expected = Just (expected, tail s)
-            | otherwise = Nothing
+        charParser s = if not $ null s && head s == expected
+            then Just (expected, tail s)
+            else Nothing
 
 -- | If one char of the first argument is the first element in the string, returns it
 -- Otherwise, returns nothing
 parseAnyChar :: String -> Parser Char
-parseAnyChar needles = Parser anyCharParser
-    where
-        anyCharParser :: ParserFunction Char
-        anyCharParser s
-            | null s = Nothing
-            | head s `elem` needles = Just (head s, tail s)
-            | otherwise = Nothing
+parseAnyChar needles = parseIf (`elem` needles)
 
 
 -- | Calls '<&>' and applies "func" on the result

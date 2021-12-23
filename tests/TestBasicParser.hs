@@ -50,6 +50,18 @@ testSuite = testGroup "Basic Parser module" [
         let expected = Nothing
         testCase "parseAnyChar: empty needles" $ expected @=? actual,
     do
+        let actual = runParser (parseString "") "abc"
+        let expected = Just ("", "abc")
+        testCase "parseString: empty" $ expected @=? actual,
+    do
+        let actual = runParser (parseString "true") "trueabc"
+        let expected = Just ("true", "abc")
+        testCase "parseString: filled string" $ expected @=? actual,
+    do
+        let actual = runParser (parseString "true") ""
+        let expected = Nothing
+        testCase "parseString: empty haystack" $ expected @=? actual,
+    do
         let actual = runParser (parseChar 'a' <|> parseChar 'b') "abcd"
         let expected = Just ('a', "bcd")
         testCase "parseOr: First is Ok" $ expected @=? actual,

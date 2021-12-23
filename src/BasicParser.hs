@@ -198,6 +198,12 @@ parseN n p = Parser $ \s -> if n <= 0 then Just ([], s)
         (parsed, res) <- runParser p s
         runParser ((parsed: ) <$> parseN (n - 1) p) res
 
+-- | Parse the string from the stream if it exists
+parseString :: String -> Parser String
+parseString string = Parser $ \s -> case string of
+    "" -> Just ("", s)
+    (char:rest) -> runParser (uncurry (:) <$> (parseChar char <&> parseString rest)) s
+
 -- | Parse anything that is not a whitespace
 parseWord :: Parser String
 parseWord = some parseNotSpace

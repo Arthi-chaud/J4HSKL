@@ -86,7 +86,7 @@ parseChar :: Char -> Parser Char
 parseChar expected = Parser charParser
     where
         charParser :: ParserFunction Char
-        charParser s = if not $ null s && head s == expected
+        charParser s = if not (null s) && head s == expected
             then Just (expected, tail s)
             else Nothing
 

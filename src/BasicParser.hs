@@ -175,13 +175,11 @@ parseScope (begin, end) = Parser $ \s -> do
 
 -- | Parse anything that is a whitespace (using 'isSpace')
 parseWhitespaces :: Parser String
-parseWhitespaces = parseWhile isSpace
+parseWhitespaces = parseWhile isSpace <|> pure ""
 
--- | Parse String While function returns true
+-- | Parse String While function returns true, Nothing if nothing was parsed
 parseWhile :: (Char -> Bool) -> Parser String
-parseWhile f = Parser $ \s -> case runParser (parseIf f) s of
-    Nothing -> Just ("", s)
-    Just (parsed, rest) -> runParser ((parsed:) <$> parseWhile f) rest
+parseWhile f = parseSome $ parseIf f
 
 -- | Parse String if function returns true
 parseIf :: (Char -> Bool) -> Parser Char
@@ -206,13 +204,7 @@ parseString string = Parser $ \s -> case string of
 
 -- | Parse anything that is not a whitespace
 parseWord :: Parser String
-parseWord = some parseNotSpace
+parseWord = parseWhile isNotSpace
     where
-        parseNotSpace :: Parser Char
-        parseNotSpace = Parser anyCharParser
-            where
-                anyCharParser :: ParserFunction Char
-                anyCharParser s
-                    | null s = Nothing
-                    | isSpace (head s) = Nothing
-                    | otherwise = Just (head s, tail s)
+        isNotSpace :: Char -> Bool
+        isNotSpace c = not $ isSpace c

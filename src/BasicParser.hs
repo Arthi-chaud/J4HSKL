@@ -115,7 +115,7 @@ parseMany :: Parser a -> Parser [a]
 parseMany p = Parser $ \s ->
     case runParser p s of
         Nothing -> Just ([], s)
-        Just (p1, rest) -> runParser ((\p2 -> p1 : p2) <$> parseMany p) rest
+        Just (p1, rest) -> runParser ((p1 :) <$> parseMany p) rest
 
 -- | While "p" doesn't returns 'Nothing', it is called on the rest
 -- Returns an array of parsed values. Returns 'Nothing' if the array is empty
@@ -134,6 +134,19 @@ parseInt = Parser intParser
         intParser s = do
             (signs, rest) <- runParser (parseMany (parseChar '-')) s
             runParser ((\nb-> nb * ((-1) ^ length signs)) <$> parseUInt) rest
+
+-- | Parse floating point number from string
+parseFloat :: Parser Float
+parseFloat = Parser $ \s -> do
+    (parsedInt, rest) <- runParser parseInt s
+    case runParser parseDecimal rest of
+        Nothing -> Just (fromInteger parsedInt, rest)
+        Just (parsedDec, rest2) -> do
+            res <- readMaybe (show parsedInt ++ parsedDec) :: Maybe Float
+            return (res, rest2)
+    where
+        parseDecimal = (\(a, b) -> a:b) <$> (parseChar '.' <&> parseSome (parseAnyChar ['0'..'9']))
+
 
 -- | Extract what's in the parenthesis
 parseScope :: (Char, Char) -> Parser String

@@ -5,6 +5,7 @@ import Test.HUnit (Assertion, assertEqual, Testable (test), (@=?), (~=?))
 import Test.Framework (Test, testGroup)
 import Test.Framework.Providers.HUnit (testCase)
 import Control.Applicative ( Alternative, (<|>), empty )
+import BasicParser (parseFloat)
 
 testSuite :: Test
 testSuite = testGroup "Basic Parser module" [
@@ -100,6 +101,30 @@ testSuite = testGroup "Basic Parser module" [
         let actual = runParser parseInt "-123, 456" 
         let expected = Just (-123, ", 456")
         testCase "parseInt: parse negative number" $ expected @=? actual,
+    do
+        let actual = runParser parseFloat "42"
+        let expected = Just (42, "")
+        testCase "parseFloat: parse positive integer" $ expected @=? actual,
+    do
+        let actual = runParser parseFloat "-123Hello"
+        let expected = Just (-123, "Hello")
+        testCase "parseFloat: parse negative integer" $ expected @=? actual,
+    do
+        let actual = runParser parseFloat "1.234aHello"
+        let expected = Just (1.234, "aHello")
+        testCase "parseFloat: parse positive float" $ expected @=? actual,
+    do
+        let actual = runParser parseFloat "-42.10"
+        let expected = Just (-42.1, "")
+        testCase "parseFloat: parse negative float" $ expected @=? actual,
+    do
+        let actual = runParser parseFloat "-42.a10"
+        let expected = Just (-42, ".a10")
+        testCase "parseFloat: Error after point" $ expected @=? actual,
+    do
+        let actual = runParser parseFloat "Hello World"
+        let expected = Nothing
+        testCase "parseFloat: not a number" $ expected @=? actual,
     do
         let actual = runParser parseWord "1 2"
         let expected = Just ("1", " 2")

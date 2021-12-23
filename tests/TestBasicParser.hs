@@ -5,7 +5,6 @@ import Test.HUnit (Assertion, assertEqual, Testable (test), (@=?), (~=?))
 import Test.Framework (Test, testGroup)
 import Test.Framework.Providers.HUnit (testCase)
 import Control.Applicative ( Alternative, (<|>), empty )
-import BasicParser (parseFloat)
 
 testSuite :: Test
 testSuite = testGroup "Basic Parser module" [

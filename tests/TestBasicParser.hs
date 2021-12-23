@@ -115,12 +115,12 @@ testSuite = testGroup "Basic Parser module" [
         testCase "parseInt: parse negative number" $ expected @=? actual,
     do
         let actual = runParser parseFloat "42"
-        let expected = Just (42, "")
-        testCase "parseFloat: parse positive integer" $ expected @=? actual,
+        let expected = Nothing
+        testCase "parseFloat: parse positive integer (returns nothing)" $ expected @=? actual,
     do
         let actual = runParser parseFloat "-123Hello"
-        let expected = Just (-123, "Hello")
-        testCase "parseFloat: parse negative integer" $ expected @=? actual,
+        let expected = Nothing
+        testCase "parseFloat: parse negative integer (returns nothing)" $ expected @=? actual,
     do
         let actual = runParser parseFloat "1.234aHello"
         let expected = Just (1.234, "aHello")
@@ -131,7 +131,7 @@ testSuite = testGroup "Basic Parser module" [
         testCase "parseFloat: parse negative float" $ expected @=? actual,
     do
         let actual = runParser parseFloat "-42.a10"
-        let expected = Just (-42, ".a10")
+        let expected = Nothing
         testCase "parseFloat: Error after point" $ expected @=? actual,
     do
         let actual = runParser parseFloat "Hello World"

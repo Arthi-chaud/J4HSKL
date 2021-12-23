@@ -128,17 +128,16 @@ parseInt = Parser intParser
             (signs, rest) <- runParser (parseMany (parseChar '-')) s
             runParser ((\nb-> nb * ((-1) ^ length signs)) <$> parseUInt) rest
 
--- | Parse floating point number from string
+-- | Parse floating point number from string, returns nothing if is NOT a floating point number
 parseFloat :: Parser Float
 parseFloat = Parser $ \s -> do
     (parsedInt, rest) <- runParser parseInt s
-    case runParser parseDecimal rest of
-        Nothing -> Just (fromInteger parsedInt, rest)
-        Just (parsedDec, rest2) -> do
-            res <- readMaybe (show parsedInt ++ parsedDec) :: Maybe Float
-            return (res, rest2)
+    (parsedDecimal, rest2) <- runParser parseDecimal rest
+    res <- readMaybe (show parsedInt ++ parsedDecimal) :: Maybe Float
+    return (res, rest2)
     where
         parseDecimal = uncurry (:) <$> (parseChar '.' <&> parseSome (parseAnyChar ['0'..'9']))
+    
 
 -- | Extract what's in the parenthesis
 parseScope :: (Char, Char) -> Parser String

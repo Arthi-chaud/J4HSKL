@@ -13,7 +13,7 @@ module BasicParser where
 
 import Data.Maybe (isNothing)
 import Text.Read
-import Data.Char
+import Data.Char(isSpace)
 import Control.Applicative ( Alternative, (<|>), empty, some)
 
 -- | A 'ParserFunction' function take a string a parameter,

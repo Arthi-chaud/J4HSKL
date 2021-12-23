@@ -120,7 +120,7 @@ parseMany p = Parser $ \s ->
 -- | While "p" doesn't returns 'Nothing', it is called on the rest
 -- Returns an array of parsed values. Returns 'Nothing' if the array is empty
 parseSome :: Parser a -> Parser [a]
-parseSome p1 = (\(a,b) -> a:b) <$> (p1 <&> parseMany p1)
+parseSome p1 = uncurry (:) <$> (p1 <&> parseMany p1)
 
 -- | Parse unsigned integer from string
 parseUInt :: Parser Integer
@@ -145,8 +145,7 @@ parseFloat = Parser $ \s -> do
             res <- readMaybe (show parsedInt ++ parsedDec) :: Maybe Float
             return (res, rest2)
     where
-        parseDecimal = (\(a, b) -> a:b) <$> (parseChar '.' <&> parseSome (parseAnyChar ['0'..'9']))
-
+        parseDecimal = uncurry (:) <$> (parseChar '.' <&> parseSome (parseAnyChar ['0'..'9']))
 
 -- | Extract what's in the parenthesis
 parseScope :: (Char, Char) -> Parser String
@@ -159,7 +158,7 @@ parseScope (begin, end) = Parser $ \s -> do
         extractParenthesis :: String -> Int -> Maybe (String, String)
         extractParenthesis [] 0 = Just ([], [])
         extractParenthesis [] _ = Nothing
-        extractParenthesis (c:rest) 0 | c == end = Nothing 
+        extractParenthesis (c:rest) 0 | c == end = Nothing
                                       | c == begin = do
                 (parsed, newRest) <- extractParenthesis rest 1
                 return (begin:parsed, newRest)

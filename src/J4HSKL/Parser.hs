@@ -20,19 +20,11 @@ parseJSON = parseJSONNumber <|> parseJSONNull <|> parseJSONBool
 
 -- | Parse null from JSON Data
 parseJSONNull :: Parser JSONValue
-parseJSONNull = Parser $ \s -> do
-    (word, rest) <- runParser parseWord s
-    if word == "null" then return (Null, rest)
-    else Nothing
+parseJSONNull = Null <$ parseString "null"
 
 -- | Parse boolean from JSON Data
 parseJSONBool :: Parser JSONValue
-parseJSONBool = Parser $ \s -> do
-    (word, rest) <- runParser parseWord s
-    case word of
-        "true" -> return (Bool True, rest)
-        "false" -> return (Bool False, rest)
-        _ -> Nothing
+parseJSONBool = (Bool False <$ parseString "false") <|> (Bool True <$ parseString "true")
 
 -- | Parse Number from JSON Data
 parseJSONNumber :: Parser JSONValue

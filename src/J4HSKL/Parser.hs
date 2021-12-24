@@ -15,6 +15,7 @@ import BasicParser
 import Text.Read (readMaybe)
 import Control.Applicative
 import Data.Char (readLitChar, isHexDigit, digitToInt, chr)
+import Data.List (nub)
 
 -- | Parse Values fron JSON Data
 parseJSON :: Parser JSONValue
@@ -79,9 +80,14 @@ parseJSONString = String <$> (parseQuote *> parseJSONStringContent)
         parseEscapedAsciiCode = getNbfromHex <$> (parseChar 'u' *> parseN 4 (parseIf isHexDigit))
         getNbfromHex = foldl (\b c -> b * 16 + digitToInt c) 0
 
--- | Parse Object from JSON Data
+-- | Parse Object from JSON Data. Returns 'Nothing' of parsed object has duplicate keys
 parseJSONObject :: Parser JSONValue
-parseJSONObject = Object <$> parseJSONCollection '{' '}' parseJSONPair
+parseJSONObject = Parser $ \s -> do
+    (pairs, rest) <- runParser (parseJSONCollection '{' '}' parseJSONPair) s 
+    if nub (map keyList pairs) == map keyList pairs
+        then return (Object pairs, rest)
+        else Nothing
+    where keyList = \(Pair (key, value)) -> key
 
 -- | Parse pair in object from JSON
 parseJSONPair :: Parser JSONPair

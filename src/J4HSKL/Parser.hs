@@ -14,9 +14,11 @@ import J4HSKL.Data
 import BasicParser
 import Text.Read (readMaybe)
 import Control.Applicative
+import Data.Char (readLitChar)
 
 parseJSON :: Parser JSONValue
-parseJSON = parseJSONNumber
+parseJSON = parseJSONString
+        <|> parseJSONNumber
         <|> parseJSONNull
         <|> parseJSONBool
 
@@ -48,3 +50,18 @@ parseJSONNumber = Parser $ \s -> do
         applySign :: Char -> Integer -> Integer
         applySign '-' nb = nb * (-1)
         applySign _ nb = nb
+
+parseJSONString :: Parser JSONValue
+parseJSONString = String <$> (parseQuote *> parseJSONStringContent)
+    where
+        parseQuote = parseChar '\"'
+        parseJSONStringContent :: Parser String
+        parseJSONStringContent = ("" <$ parseQuote) <|> Parser (\s -> do
+            (char, rest) <- runParser parseHead s
+            case char of
+                '\\' -> do
+                    (litChar, rest2) <- runParser parseEscapedChar rest
+                    runParser ((litChar:) <$> parseJSONStringContent) rest2
+                _ -> runParser ((char:) <$> parseJSONStringContent) rest
+            )
+        parseEscapedChar = (\c -> fst $ head $ readLitChar ('\\' :  [c])) <$> parseAnyChar "bfnrt"

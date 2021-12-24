@@ -39,13 +39,12 @@ parseJSONNumber = Parser $ \s -> do
         Just (exponent, rest2) -> if not (null rest2) && head rest2 == '.'
             then Nothing
             else return (Number $ fromInteger exponent, rest2)
-
     where
         parseNumber = parseLeadingZero <^> (parseFloat <|> (fromInteger <$> parseInt))
-        parseLeadingZero =  0 <$ parseChar '0'
+        parseLeadingZero = 0 <$ parseChar '0'
         parseExponent = parseAnyChar "eE" *> parseExponentNumber
         parseExponentSign = parseAnyChar "-+" <|> pure '+'
-        parseExponentNumber = uncurry applySign <$> (parseExponentSign  <&> parseUInt)
+        parseExponentNumber = uncurry applySign <$> (parseExponentSign <&> ((round <$> parseLeadingZero) <^> parseUInt))
         applySign :: Char -> Integer -> Integer
         applySign '-' nb = nb * (-1)
         applySign _ nb = nb

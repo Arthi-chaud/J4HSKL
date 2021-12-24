@@ -16,6 +16,7 @@ import Text.Read (readMaybe)
 import Control.Applicative
 import Data.Char (readLitChar, isHexDigit, digitToInt, chr)
 
+-- | Parse Values fron JSON Data
 parseJSON :: Parser JSONValue
 parseJSON = parseJSONObject
         <|> parseJSONArray
@@ -23,6 +24,12 @@ parseJSON = parseJSONObject
         <|> parseJSONNumber
         <|> parseJSONNull
         <|> parseJSONBool
+
+-- | Same as 'parseJSON' but returns 'Nothing' if unparsed content
+parseStrictJSON :: Parser JSONValue 
+parseStrictJSON = Parser $ \s -> do
+    (res, rest) <- runParser parseJSON s
+    if null rest then return (res, rest) else Nothing
 
 -- | Parse null from JSON Data
 parseJSONNull :: Parser JSONValue

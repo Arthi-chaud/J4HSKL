@@ -91,7 +91,7 @@ parseHead :: Parser Char
 parseHead = parseIf (const True)
 
 -- | If the argument is the first element in the string, returns it
--- Otherwise, returns nothing
+-- Otherwise, returns 'Nothing'
 parseChar :: Char -> Parser Char
 parseChar expected = Parser charParser
     where
@@ -101,7 +101,7 @@ parseChar expected = Parser charParser
             else Nothing
 
 -- | If one char of the first argument is the first element in the string, returns it
--- Otherwise, returns nothing
+-- Otherwise, returns 'Nothing'
 parseAnyChar :: String -> Parser Char
 parseAnyChar needles = parseIf (`elem` needles)
 
@@ -138,7 +138,7 @@ parseInt = Parser intParser
             (signs, rest) <- runParser (parseMany (parseChar '-')) s
             runParser ((\nb-> nb * ((-1) ^ length signs)) <$> parseUInt) rest
 
--- | Parse floating point number from string, returns nothing if is NOT a floating point number
+-- | Parse floating point number from string, returns 'Nothing' if is NOT a floating point number
 parseFloat :: Parser Float
 parseFloat = Parser $ \s -> do
     (parsedInt, rest) <- runParser parseInt s
@@ -179,7 +179,7 @@ parseScope (begin, end) = Parser $ \s -> do
 parseWhitespaces :: Parser String
 parseWhitespaces = parseWhile isSpace <|> pure ""
 
--- | Parse String While function returns true, Nothing if nothing was parsed
+-- | Parse String While function returns true, Nothing if 'Nothing' was parsed
 parseWhile :: (Char -> Bool) -> Parser String
 parseWhile f = parseSome $ parseIf f
 

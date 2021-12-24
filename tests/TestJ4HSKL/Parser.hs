@@ -5,7 +5,7 @@ import Test.HUnit (Assertion, assertEqual, assertFailure, Testable (test), (@=?)
 import Test.Framework (Test, testGroup)
 import Test.Framework.Providers.HUnit (testCase)
 import BasicParser (Parser(runParser))
-import J4HSKL.Parser (parseJSON)
+import J4HSKL.Parser (parseStrictJSON)
 import J4HSKL.Data
 import Text.Printf (printf)
 import System.FilePath (takeBaseName)
@@ -18,13 +18,13 @@ testSuite (validAssets, invalidAssets) = testGroup "JSON Parser module" (testsOn
         getTestName assetPath = printf "parseJSON: %s" (map (\c -> if c == '_' then ' ' else c) (takeBaseName assetPath)) 
         
         testInvalidAsset :: TestAsset -> Test
-        testInvalidAsset (assetName, asset) = testCase (getTestName assetName) $ Nothing @=? runParser parseJSON asset
+        testInvalidAsset (assetName, asset) = testCase (getTestName assetName) $ Nothing @=? runParser parseStrictJSON asset
         
         testValidAsset :: [TestAsset] -> String -> Maybe (JSONValue, String) -> Test
         testValidAsset assets assetName expected = case find (\s -> takeBaseName (fst s) == assetName) assets of
             Nothing -> testCase (getTestName assetName) $ assertFailure (printf "%s: No such asset" assetName) 
             Just (name, content) -> 
-                testCase (getTestName name) $ expected @=? runParser parseJSON content
+                testCase (getTestName name) $ expected @=? runParser parseStrictJSON content
         
         testsOnInvalid = map testInvalidAsset invalidAssets
         

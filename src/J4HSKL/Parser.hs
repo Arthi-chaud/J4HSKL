@@ -19,17 +19,17 @@ import Data.Char (readLitChar, isHexDigit, digitToInt, chr)
 -- | Parse Values fron JSON Data
 parseJSON :: Parser JSONValue
 parseJSON = parseJSONObject
+        <|> parseJSONBool
         <|> parseJSONArray
         <|> parseJSONString
         <|> parseJSONNumber
         <|> parseJSONNull
-        <|> parseJSONBool
 
 -- | Same as 'parseJSON' but returns 'Nothing' if unparsed content
-parseStrictJSON :: Parser JSONValue 
-parseStrictJSON = Parser $ \s -> do
-    (res, rest) <- runParser parseJSON s
-    if null rest then return (res, rest) else Nothing
+parseStrictJSON :: String -> Maybe JSONValue 
+parseStrictJSON stream = do
+    (res, rest) <- runParser parseJSON stream
+    if null rest then return res else Nothing
 
 -- | Parse null from JSON Data
 parseJSONNull :: Parser JSONValue

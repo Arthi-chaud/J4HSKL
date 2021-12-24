@@ -19,10 +19,10 @@ import Data.Char (readLitChar, isHexDigit, digitToInt, chr)
 -- | Parse Values fron JSON Data
 parseJSON :: Parser JSONValue
 parseJSON = parseJSONObject
-        <|> parseJSONBool
         <|> parseJSONArray
         <|> parseJSONString
         <|> parseJSONNumber
+        <|> parseJSONBool
         <|> parseJSONNull
 
 -- | Same as 'parseJSON' but returns 'Nothing' if unparsed content

@@ -14,7 +14,7 @@ import J4HSKL.Data
 import BasicParser
 import Text.Read (readMaybe)
 import Control.Applicative
-import Data.Char (readLitChar)
+import Data.Char (readLitChar, isHexDigit, digitToInt, chr)
 
 parseJSON :: Parser JSONValue
 parseJSON = parseJSONString
@@ -60,8 +60,10 @@ parseJSONString = String <$> (parseQuote *> parseJSONStringContent)
             (char, rest) <- runParser parseHead s
             case char of
                 '\\' -> do
-                    (litChar, rest2) <- runParser parseEscapedChar rest
+                    (litChar, rest2) <- runParser (parseChar '/' <|> parseEscapedChar <|> (chr <$> parseEscapedAsciiCode)) rest
                     runParser ((litChar:) <$> parseJSONStringContent) rest2
                 _ -> runParser ((char:) <$> parseJSONStringContent) rest
             )
-        parseEscapedChar = (\c -> fst $ head $ readLitChar ('\\' :  [c])) <$> parseAnyChar "bfnrt"
+        parseEscapedChar = (\c -> fst $ head $ readLitChar ('\\' :  [c])) <$> parseAnyChar "bfnrt\\\""
+        parseEscapedAsciiCode = getNbfromHex <$> (parseChar 'u' *> parseN 4 (parseIf isHexDigit))
+        getNbfromHex = foldl (\b c -> b * 16 + digitToInt c) 0

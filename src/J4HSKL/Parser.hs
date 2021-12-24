@@ -60,10 +60,11 @@ parseJSONString = String <$> (parseQuote *> parseJSONStringContent)
             (char, rest) <- runParser parseHead s
             case char of
                 '\\' -> do
-                    (litChar, rest2) <- runParser (parseChar '/' <|> parseEscapedChar <|> (chr <$> parseEscapedAsciiCode)) rest
+                    (litChar, rest2) <- runParser parseEscaped rest
                     runParser ((litChar:) <$> parseJSONStringContent) rest2
                 _ -> runParser ((char:) <$> parseJSONStringContent) rest
             )
-        parseEscapedChar = (\c -> fst $ head $ readLitChar ('\\' :  [c])) <$> parseAnyChar "bfnrt\\\""
+        parseEscaped = parseEscapedChar <|> (chr <$> parseEscapedAsciiCode)
+        parseEscapedChar = parseChar '/' <|> ((\c -> fst $ head $ readLitChar ('\\' :  [c])) <$> parseAnyChar "bfnrt\\\"")
         parseEscapedAsciiCode = getNbfromHex <$> (parseChar 'u' *> parseN 4 (parseIf isHexDigit))
         getNbfromHex = foldl (\b c -> b * 16 + digitToInt c) 0

@@ -17,7 +17,9 @@ import Control.Applicative
 import Data.Char (readLitChar, isHexDigit, digitToInt, chr)
 
 parseJSON :: Parser JSONValue
-parseJSON = parseJSONString
+parseJSON = parseJSONObject
+        <|> parseJSONArray
+        <|> parseJSONString
         <|> parseJSONNumber
         <|> parseJSONNull
         <|> parseJSONBool
@@ -51,6 +53,7 @@ parseJSONNumber = Parser $ \s -> do
         applySign '-' nb = nb * (-1)
         applySign _ nb = nb
 
+-- | Parse String from JSON Data
 parseJSONString :: Parser JSONValue
 parseJSONString = String <$> (parseQuote *> parseJSONStringContent)
     where
@@ -68,3 +71,29 @@ parseJSONString = String <$> (parseQuote *> parseJSONStringContent)
         parseEscapedChar = parseChar '/' <|> ((\c -> fst $ head $ readLitChar ('\\' :  [c])) <$> parseAnyChar "bfnrt\\\"")
         parseEscapedAsciiCode = getNbfromHex <$> (parseChar 'u' *> parseN 4 (parseIf isHexDigit))
         getNbfromHex = foldl (\b c -> b * 16 + digitToInt c) 0
+
+-- | Parse Object from JSON Data
+parseJSONObject :: Parser JSONValue
+parseJSONObject = Object <$> parseJSONCollection '{' '}' parseJSONPair
+
+-- | Parse pair in object from JSON
+parseJSONPair :: Parser JSONPair
+parseJSONPair = (\(String key, value) -> Pair (key, value)) <$> ((parseJSONString <* parseSeparator) <&> parseJSON)
+    where
+        parseSeparator = parseWhitespaces <* parseChar ':' <* parseWhitespaces
+
+-- | Parse Array from JSON
+parseJSONArray :: Parser JSONValue
+parseJSONArray = Array <$> parseJSONCollection '[' ']' parseJSON
+
+-- | Parse collection (array or object) from JSON using delimiters and a value parser
+parseJSONCollection :: Char -> Char -> Parser a -> Parser [a]
+parseJSONCollection begin end parseValue = parseEmptyCollection <|> (parseChar begin *> parseCollectionContent)
+    where
+        parseEmptyCollection = [] <$ parseChar begin <* parseWhitespaces <&> parseChar end
+        parseCollectionContent = Parser $ \s -> do
+            ((value, next), rest) <- runParser ((parseWhitespaces *> parseValue <* parseWhitespaces) <&> parseHead) s
+            if next == end then return ([value], rest)
+            else case next of
+                ',' -> runParser ((value:) <$> parseCollectionContent) rest
+                _ -> Nothing

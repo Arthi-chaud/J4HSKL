@@ -86,6 +86,10 @@ p1 <%> p2 = Parser (\s -> do
     Just (parsed2, rest2++rest1)
     )
 
+-- | Parse the first element of the stream
+parseHead :: Parser Char
+parseHead = parseIf (const True)
+
 -- | If the argument is the first element in the string, returns it
 -- Otherwise, returns nothing
 parseChar :: Char -> Parser Char

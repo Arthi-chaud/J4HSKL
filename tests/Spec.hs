@@ -2,6 +2,7 @@ import Test.Framework (defaultMain)
 import TestBasicParser
 import TestJ4HSKL.Parser
 import TestJ4HSKL.Data
+import TestJ4HSKL.PrettyPrint
 import Assets (loadTestAssets)
 
 main :: IO ()
@@ -10,7 +11,8 @@ main = do
     defaultMain [ 
         TestBasicParser.testSuite,
         TestJ4HSKL.Data.testSuite,
-        TestJ4HSKL.Parser.testSuite testAssets 
+        TestJ4HSKL.Parser.testSuite testAssets,
+        TestJ4HSKL.PrettyPrint.testSuite
         ]
 
     

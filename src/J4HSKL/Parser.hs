@@ -52,7 +52,7 @@ parseJSONNumber = Parser $ \s -> do
             then Nothing
             else return (Number $ number ^^ fromInteger exponent, rest2)
     where
-        parseNumber = parseMinusZero <^> (parseLeadingZero <^> (parseFloat <|> (fromInteger <$> parseInt)))
+        parseNumber = parseMinusZero <|> (parseLeadingZero <^> (parseFloat <|> (fromInteger <$> parseInt)))
         parseMinusZero = snd <$> parseChar '-' <&> parseLeadingZero
         parseLeadingZero = 0 <$ parseChar '0'
         parseSignAndLeadingZero = parseSign <&> parseLeadingZero

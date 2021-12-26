@@ -50,7 +50,7 @@ parseJSONNumber = Parser $ \s -> do
         Nothing -> Just (Number number, rest)
         Just (exponent, rest2) -> if not (null rest2) && head rest2 == '.'
             then Nothing
-            else return (Number $ fromInteger exponent, rest2)
+            else return (Number $ number ^^ fromInteger exponent, rest2)
     where
         parseNumber = parseLeadingZero <^> (parseFloat <|> (fromInteger <$> parseInt))
         parseLeadingZero = 0 <$ parseChar '0'

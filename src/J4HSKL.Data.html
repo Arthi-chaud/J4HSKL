@@ -1,0 +1,249 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-comment">{-|
+Module      : J4HSL.Data
+Description : Data representation for JSON values
+Copyright   : (c) Arthui-chaud, 2021
+License     : GPL-3
+Maintainer  : arthur.jamet@gmail.com
+Stability   : experimental
+Portability : POSIX
+
+-}</span><span>
+</span><span id="line-11"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">J4HSKL.Data</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-12"></span><span>
+</span><span id="line-13"></span><span>
+</span><span id="line-14"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Text.Printf</span></span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">printf</span></span><span class="hs-special">)</span><span>
+</span><span id="line-15"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.List</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">intercalate</span></span><span class="hs-special">)</span><span>
+</span><span id="line-16"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Char</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">isSpace</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">showLitChar</span></span><span class="hs-special">)</span><span>
+</span><span id="line-17"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="BasicParser.html"><span class="hs-identifier">BasicParser</span></a></span><span>
+</span><span id="line-18"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Numeric</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">showGFloatAlt</span></span><span class="hs-special">)</span><span>
+</span><span id="line-19"></span><span>
+</span><span id="line-20"></span><span class="hs-comment">-- | Defines types of JSON Values</span><span>
+</span><span id="line-21"></span><span class="hs-keyword">data</span><span> </span><span id="JSONValue"><span class="annot"><a href="J4HSKL.Data.html#JSONValue"><span class="hs-identifier hs-var">JSONValue</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span>
+</span><span id="line-22"></span><span>    </span><span id="Null"><span class="annot"><a href="J4HSKL.Data.html#Null"><span class="hs-identifier hs-var">Null</span></a></span></span><span> </span><span class="hs-comment">-- ^ </span><span>
+</span><span id="line-23"></span><span>   </span><span class="hs-glyph">|</span><span> </span><span id="Bool"><span class="annot"><a href="J4HSKL.Data.html#Bool"><span class="hs-identifier hs-var">Bool</span></a></span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Bool</span></span><span> </span><span class="hs-comment">-- ^ Boolean for JSON</span><span>
+</span><span id="line-24"></span><span>   </span><span class="hs-glyph">|</span><span> </span><span id="Number"><span class="annot"><a href="J4HSKL.Data.html#Number"><span class="hs-identifier hs-var">Number</span></a></span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Float</span></span><span>  </span><span class="hs-comment">-- ^ Number for JSON</span><span>
+</span><span id="line-25"></span><span>   </span><span class="hs-glyph">|</span><span> </span><span id="String"><span class="annot"><a href="J4HSKL.Data.html#String"><span class="hs-identifier hs-var">String</span></a></span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span> </span><span class="hs-comment">-- ^ String for JSON</span><span>
+</span><span id="line-26"></span><span>   </span><span class="hs-glyph">|</span><span> </span><span id="Array"><span class="annot"><a href="J4HSKL.Data.html#Array"><span class="hs-identifier hs-var">Array</span></a></span></span><span> </span><span class="hs-special">[</span><span class="annot"><a href="J4HSKL.Data.html#JSONValue"><span class="hs-identifier hs-type">JSONValue</span></a></span><span class="hs-special">]</span><span> </span><span class="hs-comment">-- ^ Array for JSON</span><span>
+</span><span id="line-27"></span><span>   </span><span class="hs-glyph">|</span><span> </span><span id="Pair"><span class="annot"><a href="J4HSKL.Data.html#Pair"><span class="hs-identifier hs-var">Pair</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="J4HSKL.Data.html#JSONValue"><span class="hs-identifier hs-type">JSONValue</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-comment">-- ^ Pair for Objects (only used in object, never as standalone)</span><span>
+</span><span id="line-28"></span><span>   </span><span class="hs-glyph">|</span><span> </span><span id="Object"><span class="annot"><a href="J4HSKL.Data.html#Object"><span class="hs-identifier hs-var">Object</span></a></span></span><span> </span><span class="hs-special">[</span><span class="annot"><a href="J4HSKL.Data.html#JSONValue"><span class="hs-identifier hs-type">JSONValue</span></a></span><span class="hs-special">]</span><span> </span><span class="hs-comment">-- ^ JSON's Object</span><span>
+</span><span id="line-29"></span><span>
+</span><span id="line-30"></span><span>
+</span><span id="line-31"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679032817"><span id="local-6989586621679032820"><span class="annot"><span class="hs-identifier hs-type">Show</span></span><span> </span><span class="annot"><a href="J4HSKL.Data.html#JSONValue"><span class="hs-identifier hs-type">JSONValue</span></a></span></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-32"></span><span>    </span><span id="local-6989586621679032815"><span class="annot"><span class="annottext">show :: JSONValue -&gt; String
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var">show</span></span></span><span> </span><span class="annot"><span class="annottext">JSONValue
+</span><a href="J4HSKL.Data.html#Null"><span class="hs-identifier hs-var">Null</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;null&quot;</span></span><span>
+</span><span id="line-33"></span><span>    </span><span class="annot"><span class="hs-identifier hs-var">show</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="J4HSKL.Data.html#Bool"><span class="hs-identifier hs-type">Bool</span></a></span><span> </span><span id="local-6989586621679032813"><span class="annot"><span class="annottext">Bool
+</span><a href="#local-6989586621679032813"><span class="hs-identifier hs-var">v</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="#local-6989586621679032813"><span class="hs-identifier hs-var">v</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;true&quot;</span></span><span>
+</span><span id="line-34"></span><span>                  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">otherwise</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;false&quot;</span></span><span>
+</span><span id="line-35"></span><span>    </span><span class="annot"><span class="hs-identifier hs-var">show</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="J4HSKL.Data.html#Number"><span class="hs-identifier hs-type">Number</span></a></span><span> </span><span id="local-6989586621679032812"><span class="annot"><span class="annottext">Float
+</span><a href="#local-6989586621679032812"><span class="hs-identifier hs-var">v</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Float -&gt; String
+</span><a href="J4HSKL.Data.html#showJSONNumber"><span class="hs-identifier hs-var">showJSONNumber</span></a></span><span> </span><span class="annot"><span class="annottext">Float
+</span><a href="#local-6989586621679032812"><span class="hs-identifier hs-var">v</span></a></span><span>
+</span><span id="line-36"></span><span>    </span><span class="annot"><span class="hs-identifier hs-var">show</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="J4HSKL.Data.html#String"><span class="hs-identifier hs-type">String</span></a></span><span> </span><span id="local-6989586621679032810"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679032810"><span class="hs-identifier hs-var">v</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String -&gt; ShowS
+forall r. PrintfType r =&gt; String -&gt; r
+</span><span class="hs-identifier hs-var">printf</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;\&quot;%s\&quot;&quot;</span></span><span> </span><span class="annot"><span class="annottext">ShowS -&gt; ShowS
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">ShowS
+</span><a href="J4HSKL.Data.html#showJSONString"><span class="hs-identifier hs-var">showJSONString</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679032810"><span class="hs-identifier hs-var">v</span></a></span><span>
+</span><span id="line-37"></span><span>    </span><span class="annot"><span class="hs-identifier hs-var">show</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="J4HSKL.Data.html#Array"><span class="hs-identifier hs-type">Array</span></a></span><span> </span><span id="local-6989586621679032808"><span class="annot"><span class="annottext">[JSONValue]
+</span><a href="#local-6989586621679032808"><span class="hs-identifier hs-var">v</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String -&gt; ShowS
+forall r. PrintfType r =&gt; String -&gt; r
+</span><span class="hs-identifier hs-var">printf</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;[%s]&quot;</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">String -&gt; [String] -&gt; String
+forall a. [a] -&gt; [[a]] -&gt; [a]
+</span><span class="hs-identifier hs-var">intercalate</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;, &quot;</span></span><span> </span><span class="annot"><span class="annottext">([String] -&gt; String) -&gt; [String] -&gt; String
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">(JSONValue -&gt; String) -&gt; [JSONValue] -&gt; [String]
+forall a b. (a -&gt; b) -&gt; [a] -&gt; [b]
+</span><span class="hs-identifier hs-var">map</span></span><span> </span><span class="annot"><span class="annottext">JSONValue -&gt; String
+forall a. Show a =&gt; a -&gt; String
+</span><span class="hs-identifier hs-var">show</span></span><span> </span><span class="annot"><span class="annottext">[JSONValue]
+</span><a href="#local-6989586621679032808"><span class="hs-identifier hs-var">v</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-38"></span><span>    </span><span class="annot"><span class="hs-identifier hs-var">show</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="J4HSKL.Data.html#Pair"><span class="hs-identifier hs-type">Pair</span></a></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679032807"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679032807"><span class="hs-identifier hs-var">key</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679032806"><span class="annot"><span class="annottext">JSONValue
+</span><a href="#local-6989586621679032806"><span class="hs-identifier hs-var">value</span></a></span></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String -&gt; String -&gt; ShowS
+forall r. PrintfType r =&gt; String -&gt; r
+</span><span class="hs-identifier hs-var">printf</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;%s: %s&quot;</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ShowS
+forall a. Show a =&gt; a -&gt; String
+</span><span class="hs-identifier hs-var">show</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679032807"><span class="hs-identifier hs-var">key</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">ShowS -&gt; ShowS
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">JSONValue -&gt; String
+forall a. Show a =&gt; a -&gt; String
+</span><span class="hs-identifier hs-var">show</span></span><span> </span><span class="annot"><span class="annottext">JSONValue
+</span><a href="#local-6989586621679032806"><span class="hs-identifier hs-var">value</span></a></span><span>
+</span><span id="line-39"></span><span>    </span><span class="annot"><span class="hs-identifier hs-var">show</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="J4HSKL.Data.html#Object"><span class="hs-identifier hs-type">Object</span></a></span><span> </span><span id="local-6989586621679032805"><span class="annot"><span class="annottext">[JSONValue]
+</span><a href="#local-6989586621679032805"><span class="hs-identifier hs-var">v</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String -&gt; ShowS
+forall r. PrintfType r =&gt; String -&gt; r
+</span><span class="hs-identifier hs-var">printf</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;{%s}&quot;</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">String -&gt; [String] -&gt; String
+forall a. [a] -&gt; [[a]] -&gt; [a]
+</span><span class="hs-identifier hs-var">intercalate</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;, &quot;</span></span><span> </span><span class="annot"><span class="annottext">([String] -&gt; String) -&gt; [String] -&gt; String
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">(JSONValue -&gt; String) -&gt; [JSONValue] -&gt; [String]
+forall a b. (a -&gt; b) -&gt; [a] -&gt; [b]
+</span><span class="hs-identifier hs-var">map</span></span><span> </span><span class="annot"><span class="annottext">JSONValue -&gt; String
+forall a. Show a =&gt; a -&gt; String
+</span><span class="hs-identifier hs-var">show</span></span><span> </span><span class="annot"><span class="annottext">[JSONValue]
+</span><a href="#local-6989586621679032805"><span class="hs-identifier hs-var">v</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-40"></span><span>
+</span><span id="line-41"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679032802"><span class="annot"><span class="hs-identifier hs-type">Eq</span></span><span> </span><span class="annot"><a href="J4HSKL.Data.html#JSONValue"><span class="hs-identifier hs-type">JSONValue</span></a></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-42"></span><span>    </span><span id="local-6989586621679032800"><span class="annot"><span class="annottext">== :: JSONValue -&gt; JSONValue -&gt; Bool
+</span><span class="hs-operator hs-var hs-var hs-var hs-var">(==)</span></span></span><span> </span><span class="annot"><span class="annottext">JSONValue
+</span><a href="J4HSKL.Data.html#Null"><span class="hs-identifier hs-var">Null</span></a></span><span> </span><span class="annot"><span class="annottext">JSONValue
+</span><a href="J4HSKL.Data.html#Null"><span class="hs-identifier hs-var">Null</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span>
+</span><span id="line-43"></span><span>    </span><span class="annot"><span class="hs-operator hs-var">(==)</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="J4HSKL.Data.html#Bool"><span class="hs-identifier hs-type">Bool</span></a></span><span> </span><span id="local-6989586621679032799"><span class="annot"><span class="annottext">Bool
+</span><a href="#local-6989586621679032799"><span class="hs-identifier hs-var">a</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="J4HSKL.Data.html#Bool"><span class="hs-identifier hs-type">Bool</span></a></span><span> </span><span id="local-6989586621679032798"><span class="annot"><span class="annottext">Bool
+</span><a href="#local-6989586621679032798"><span class="hs-identifier hs-var">b</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="#local-6989586621679032799"><span class="hs-identifier hs-var">a</span></a></span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">==</span></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="#local-6989586621679032798"><span class="hs-identifier hs-var">b</span></a></span><span>
+</span><span id="line-44"></span><span>    </span><span class="annot"><span class="hs-operator hs-var">(==)</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="J4HSKL.Data.html#Number"><span class="hs-identifier hs-type">Number</span></a></span><span> </span><span id="local-6989586621679032797"><span class="annot"><span class="annottext">Float
+</span><a href="#local-6989586621679032797"><span class="hs-identifier hs-var">a</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="J4HSKL.Data.html#Number"><span class="hs-identifier hs-type">Number</span></a></span><span> </span><span id="local-6989586621679032796"><span class="annot"><span class="annottext">Float
+</span><a href="#local-6989586621679032796"><span class="hs-identifier hs-var">b</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Float
+</span><a href="#local-6989586621679032797"><span class="hs-identifier hs-var">a</span></a></span><span> </span><span class="annot"><span class="annottext">Float -&gt; Float -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">==</span></span><span> </span><span class="annot"><span class="annottext">Float
+</span><a href="#local-6989586621679032796"><span class="hs-identifier hs-var">b</span></a></span><span>
+</span><span id="line-45"></span><span>    </span><span class="annot"><span class="hs-operator hs-var">(==)</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="J4HSKL.Data.html#String"><span class="hs-identifier hs-type">String</span></a></span><span> </span><span id="local-6989586621679032795"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679032795"><span class="hs-identifier hs-var">a</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="J4HSKL.Data.html#String"><span class="hs-identifier hs-type">String</span></a></span><span> </span><span id="local-6989586621679032794"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679032794"><span class="hs-identifier hs-var">b</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679032795"><span class="hs-identifier hs-var">a</span></a></span><span> </span><span class="annot"><span class="annottext">String -&gt; String -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">==</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679032794"><span class="hs-identifier hs-var">b</span></a></span><span>
+</span><span id="line-46"></span><span>    </span><span class="annot"><span class="hs-operator hs-var">(==)</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="J4HSKL.Data.html#Array"><span class="hs-identifier hs-type">Array</span></a></span><span> </span><span id="local-6989586621679032793"><span class="annot"><span class="annottext">[JSONValue]
+</span><a href="#local-6989586621679032793"><span class="hs-identifier hs-var">a</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="J4HSKL.Data.html#Array"><span class="hs-identifier hs-type">Array</span></a></span><span> </span><span id="local-6989586621679032792"><span class="annot"><span class="annottext">[JSONValue]
+</span><a href="#local-6989586621679032792"><span class="hs-identifier hs-var">b</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[JSONValue]
+</span><a href="#local-6989586621679032793"><span class="hs-identifier hs-var">a</span></a></span><span> </span><span class="annot"><span class="annottext">[JSONValue] -&gt; [JSONValue] -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">==</span></span><span> </span><span class="annot"><span class="annottext">[JSONValue]
+</span><a href="#local-6989586621679032792"><span class="hs-identifier hs-var">b</span></a></span><span>
+</span><span id="line-47"></span><span>    </span><span class="annot"><span class="hs-operator hs-var">(==)</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="J4HSKL.Data.html#Object"><span class="hs-identifier hs-type">Object</span></a></span><span> </span><span id="local-6989586621679032791"><span class="annot"><span class="annottext">[JSONValue]
+</span><a href="#local-6989586621679032791"><span class="hs-identifier hs-var">a</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="J4HSKL.Data.html#Object"><span class="hs-identifier hs-type">Object</span></a></span><span> </span><span id="local-6989586621679032790"><span class="annot"><span class="annottext">[JSONValue]
+</span><a href="#local-6989586621679032790"><span class="hs-identifier hs-var">b</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[JSONValue]
+</span><a href="#local-6989586621679032791"><span class="hs-identifier hs-var">a</span></a></span><span> </span><span class="annot"><span class="annottext">[JSONValue] -&gt; [JSONValue] -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">==</span></span><span> </span><span class="annot"><span class="annottext">[JSONValue]
+</span><a href="#local-6989586621679032790"><span class="hs-identifier hs-var">b</span></a></span><span>
+</span><span id="line-48"></span><span>    </span><span class="annot"><span class="hs-operator hs-var">(==)</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="J4HSKL.Data.html#Pair"><span class="hs-identifier hs-type">Pair</span></a></span><span> </span><span id="local-6989586621679032789"><span class="annot"><span class="annottext">(String, JSONValue)
+</span><a href="#local-6989586621679032789"><span class="hs-identifier hs-var">a</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="J4HSKL.Data.html#Pair"><span class="hs-identifier hs-type">Pair</span></a></span><span> </span><span id="local-6989586621679032788"><span class="annot"><span class="annottext">(String, JSONValue)
+</span><a href="#local-6989586621679032788"><span class="hs-identifier hs-var">b</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(String, JSONValue)
+</span><a href="#local-6989586621679032789"><span class="hs-identifier hs-var">a</span></a></span><span> </span><span class="annot"><span class="annottext">(String, JSONValue) -&gt; (String, JSONValue) -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">==</span></span><span> </span><span class="annot"><span class="annottext">(String, JSONValue)
+</span><a href="#local-6989586621679032788"><span class="hs-identifier hs-var">b</span></a></span><span>
+</span><span id="line-49"></span><span>    </span><span class="annot"><span class="hs-operator hs-var">(==)</span></span><span> </span><span class="annot"><span class="annottext">JSONValue
+</span><span class="hs-identifier">_</span></span><span> </span><span class="annot"><span class="annottext">JSONValue
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">False</span></span><span>
+</span><span id="line-50"></span><span>
+</span><span id="line-51"></span><span class="hs-comment">-- | Fromat String for JSON (without quotes)</span><span>
+</span><span id="line-52"></span><span class="annot"><a href="J4HSKL.Data.html#showJSONString"><span class="hs-identifier hs-type">showJSONString</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span>
+</span><span id="line-53"></span><span id="showJSONString"><span class="annot"><span class="annottext">showJSONString :: ShowS
+</span><a href="J4HSKL.Data.html#showJSONString"><span class="hs-identifier hs-var hs-var">showJSONString</span></a></span></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;&quot;</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;&quot;</span></span><span>
+</span><span id="line-54"></span><span class="annot"><a href="J4HSKL.Data.html#showJSONString"><span class="hs-identifier hs-var">showJSONString</span></a></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679032787"><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679032787"><span class="hs-identifier hs-var">char</span></a></span></span><span class="annot"><span class="hs-glyph hs-type">:</span></span><span id="local-6989586621679032786"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679032786"><span class="hs-identifier hs-var">rest</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>  </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">Parser Char -&gt; ParserFunction Char
+forall a. Parser a -&gt; ParserFunction a
+</span><a href="BasicParser.html#runParser"><span class="hs-identifier hs-var hs-var">runParser</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">String -&gt; Parser Char
+</span><a href="BasicParser.html#parseAnyChar"><span class="hs-identifier hs-var">parseAnyChar</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;/\\\&quot;&quot;</span></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679032787"><span class="hs-identifier hs-var">char</span></a></span><span class="annot"><span class="annottext">Char -&gt; ShowS
+forall a. a -&gt; [a] -&gt; [a]
+</span><span class="hs-glyph hs-var">:</span></span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679032786"><span class="hs-identifier hs-var">rest</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-55"></span><span>    </span><span class="annot"><span class="hs-identifier hs-type">Just</span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679032783"><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679032783"><span class="hs-identifier hs-var">c</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679032782"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679032782"><span class="hs-identifier hs-var">rest</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">String -&gt; Char -&gt; ShowS
+forall r. PrintfType r =&gt; String -&gt; r
+</span><span class="hs-identifier hs-var">printf</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;\\%c%s&quot;</span></span><span> </span><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679032783"><span class="hs-identifier hs-var">c</span></a></span><span> </span><span class="annot"><span class="annottext">ShowS -&gt; ShowS
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">ShowS
+</span><a href="J4HSKL.Data.html#showJSONString"><span class="hs-identifier hs-var">showJSONString</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679032782"><span class="hs-identifier hs-var">rest</span></a></span><span>
+</span><span id="line-56"></span><span>    </span><span class="annot"><span class="annottext">Maybe (Char, String)
+</span><span class="hs-identifier hs-var">Nothing</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">if</span><span> </span><span class="annot"><span class="annottext">String -&gt; Int
+forall (t :: * -&gt; *) a. Foldable t =&gt; t a -&gt; Int
+</span><span class="hs-identifier hs-var">length</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679032780"><span class="hs-identifier hs-var">litChar</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">&lt;=</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">2</span></span><span>
+</span><span id="line-57"></span><span>    </span><span class="hs-keyword">then</span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679032780"><span class="hs-identifier hs-var">litChar</span></a></span><span> </span><span class="annot"><span class="annottext">String -&gt; ShowS
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span> </span><span class="annot"><span class="annottext">ShowS
+</span><a href="J4HSKL.Data.html#showJSONString"><span class="hs-identifier hs-var">showJSONString</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679032786"><span class="hs-identifier hs-var">rest</span></a></span><span>
+</span><span id="line-58"></span><span>    </span><span class="hs-keyword">else</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">String -&gt; Char -&gt; String
+forall r. PrintfType r =&gt; String -&gt; r
+</span><span class="hs-identifier hs-var">printf</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;\\u%04X&quot;</span></span><span> </span><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679032787"><span class="hs-identifier hs-var">char</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">String -&gt; ShowS
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span> </span><span class="annot"><span class="annottext">ShowS
+</span><a href="J4HSKL.Data.html#showJSONString"><span class="hs-identifier hs-var">showJSONString</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679032786"><span class="hs-identifier hs-var">rest</span></a></span><span>
+</span><span id="line-59"></span><span>    </span><span class="hs-keyword">where</span><span>
+</span><span id="line-60"></span><span>        </span><span id="local-6989586621679032780"><span class="annot"><span class="annottext">litChar :: String
+</span><a href="#local-6989586621679032780"><span class="hs-identifier hs-var hs-var">litChar</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char -&gt; ShowS
+</span><span class="hs-identifier hs-var">showLitChar</span></span><span> </span><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679032787"><span class="hs-identifier hs-var">char</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;&quot;</span></span><span>
+</span><span id="line-61"></span><span>
+</span><span id="line-62"></span><span class="hs-comment">-- | Format Number for JSON</span><span>
+</span><span id="line-63"></span><span class="annot"><a href="J4HSKL.Data.html#showJSONNumber"><span class="hs-identifier hs-type">showJSONNumber</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Float</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span> </span><span>
+</span><span id="line-64"></span><span id="showJSONNumber"><span class="annot"><span class="annottext">showJSONNumber :: Float -&gt; String
+</span><a href="J4HSKL.Data.html#showJSONNumber"><span class="hs-identifier hs-var hs-var">showJSONNumber</span></a></span></span><span> </span><span id="local-6989586621679032778"><span class="annot"><span class="annottext">Float
+</span><a href="#local-6989586621679032778"><span class="hs-identifier hs-var">number</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">Int -&gt; ShowS
+forall a. Int -&gt; [a] -&gt; [a]
+</span><span class="hs-identifier hs-var">drop</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679032776"><span class="hs-identifier hs-var">strlen</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-glyph hs-var">-</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">2</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679032775"><span class="hs-identifier hs-var">string</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-65"></span><span>    </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;.0&quot;</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Int -&gt; ShowS
+forall a. Int -&gt; [a] -&gt; [a]
+</span><span class="hs-identifier hs-var">take</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679032776"><span class="hs-identifier hs-var">strlen</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-glyph hs-var">-</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">2</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679032775"><span class="hs-identifier hs-var">string</span></a></span><span>
+</span><span id="line-66"></span><span>    </span><span class="annot"><span class="annottext">String
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679032775"><span class="hs-identifier hs-var">string</span></a></span><span>
+</span><span id="line-67"></span><span>    </span><span class="hs-keyword">where</span><span>
+</span><span id="line-68"></span><span>        </span><span id="local-6989586621679032776"><span class="annot"><span class="annottext">strlen :: Int
+</span><a href="#local-6989586621679032776"><span class="hs-identifier hs-var hs-var">strlen</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String -&gt; Int
+forall (t :: * -&gt; *) a. Foldable t =&gt; t a -&gt; Int
+</span><span class="hs-identifier hs-var">length</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679032775"><span class="hs-identifier hs-var">string</span></a></span><span>
+</span><span id="line-69"></span><span>        </span><span id="local-6989586621679032775"><span class="annot"><span class="annottext">string :: String
+</span><a href="#local-6989586621679032775"><span class="hs-identifier hs-var hs-var">string</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Maybe Int -&gt; Float -&gt; ShowS
+forall a. RealFloat a =&gt; Maybe Int -&gt; a -&gt; ShowS
+</span><span class="hs-identifier hs-var">showGFloatAlt</span></span><span> </span><span class="annot"><span class="annottext">Maybe Int
+forall a. Maybe a
+</span><span class="hs-identifier hs-var">Nothing</span></span><span> </span><span class="annot"><span class="annottext">Float
+</span><a href="#local-6989586621679032778"><span class="hs-identifier hs-var">number</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;&quot;</span></span></pre></body></html>

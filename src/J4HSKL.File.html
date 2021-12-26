@@ -1,0 +1,226 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-comment">{-|
+Module      : J4HSL.File
+Description : Interact with Files
+Copyright   : (c) Arthui-chaud, 2021
+License     : GPL-3
+Maintainer  : arthur.jamet@gmail.com
+Stability   : experimental
+Portability : POSIX
+
+-}</span><span>
+</span><span id="line-11"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">J4HSKL.File</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-12"></span><span>
+</span><span id="line-13"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="J4HSKL.Data.html"><span class="hs-identifier">J4HSKL.Data</span></a></span><span>
+</span><span id="line-14"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="J4HSKL.Parser.html"><span class="hs-identifier">J4HSKL.Parser</span></a></span><span>
+</span><span id="line-15"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="BasicParser.html"><span class="hs-identifier">BasicParser</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="BasicParser.html#Parser"><span class="hs-identifier">Parser</span></a></span><span class="hs-special">(</span><span class="annot"><a href="BasicParser.html#runParser"><span class="hs-identifier">runParser</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-16"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">GHC.Base</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">error</span></span><span class="hs-special">)</span><span>
+</span><span id="line-17"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Text.Printf</span></span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">printf</span></span><span class="hs-special">)</span><span>
+</span><span id="line-18"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Maybe</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">isNothing</span></span><span class="hs-special">)</span><span>
+</span><span id="line-19"></span><span>
+</span><span id="line-20"></span><span class="hs-comment">-- | Export value to JSON-formatted in file</span><span>
+</span><span id="line-21"></span><span class="annot"><a href="J4HSKL.File.html#exportJSON"><span class="hs-identifier hs-type">exportJSON</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="J4HSKL.Data.html#JSONValue"><span class="hs-identifier hs-type">JSONValue</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">FilePath</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span class="hs-special">(</span><span class="hs-special">)</span><span>
+</span><span id="line-22"></span><span id="exportJSON"><span class="annot"><span class="annottext">exportJSON :: JSONValue -&gt; FilePath -&gt; IO ()
+</span><a href="J4HSKL.File.html#exportJSON"><span class="hs-identifier hs-var hs-var">exportJSON</span></a></span></span><span> </span><span id="local-6989586621679033064"><span class="annot"><span class="annottext">JSONValue
+</span><a href="#local-6989586621679033064"><span class="hs-identifier hs-var">value</span></a></span></span><span> </span><span id="local-6989586621679033063"><span class="annot"><span class="annottext">FilePath
+</span><a href="#local-6989586621679033063"><span class="hs-identifier hs-var">path</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">FilePath -&gt; FilePath -&gt; IO ()
+</span><span class="hs-identifier hs-var">writeFile</span></span><span> </span><span class="annot"><span class="annottext">FilePath
+</span><a href="#local-6989586621679033063"><span class="hs-identifier hs-var">path</span></a></span><span> </span><span class="annot"><span class="annottext">(FilePath -&gt; IO ()) -&gt; FilePath -&gt; IO ()
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">JSONValue -&gt; FilePath
+</span><a href="J4HSKL.File.html#dumpJSON"><span class="hs-identifier hs-var">dumpJSON</span></a></span><span> </span><span class="annot"><span class="annottext">JSONValue
+</span><a href="#local-6989586621679033064"><span class="hs-identifier hs-var">value</span></a></span><span>
+</span><span id="line-23"></span><span>
+</span><span id="line-24"></span><span class="hs-comment">-- | Dump data to JSON-formatted string, with indentation</span><span>
+</span><span id="line-25"></span><span class="annot"><a href="J4HSKL.File.html#dumpJSON"><span class="hs-identifier hs-type">dumpJSON</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="J4HSKL.Data.html#JSONValue"><span class="hs-identifier hs-type">JSONValue</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span>
+</span><span id="line-26"></span><span id="dumpJSON"><span class="annot"><span class="annottext">dumpJSON :: JSONValue -&gt; FilePath
+</span><a href="J4HSKL.File.html#dumpJSON"><span class="hs-identifier hs-var hs-var">dumpJSON</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="J4HSKL.Data.html#Array"><span class="hs-identifier hs-type">Array</span></a></span><span> </span><span id="local-6989586621679033058"><span class="annot"><span class="annottext">[JSONValue]
+</span><a href="#local-6989586621679033058"><span class="hs-identifier hs-var">a</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char -&gt; Char -&gt; Int -&gt; [JSONValue] -&gt; FilePath
+</span><a href="J4HSKL.File.html#dumpJSONCollection"><span class="hs-identifier hs-var">dumpJSONCollection</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'['</span></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">']'</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0</span></span><span> </span><span class="annot"><span class="annottext">[JSONValue]
+</span><a href="#local-6989586621679033058"><span class="hs-identifier hs-var">a</span></a></span><span>
+</span><span id="line-27"></span><span class="annot"><a href="J4HSKL.File.html#dumpJSON"><span class="hs-identifier hs-var">dumpJSON</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="J4HSKL.Data.html#Object"><span class="hs-identifier hs-type">Object</span></a></span><span> </span><span id="local-6989586621679033055"><span class="annot"><span class="annottext">[JSONValue]
+</span><a href="#local-6989586621679033055"><span class="hs-identifier hs-var">a</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char -&gt; Char -&gt; Int -&gt; [JSONValue] -&gt; FilePath
+</span><a href="J4HSKL.File.html#dumpJSONCollection"><span class="hs-identifier hs-var">dumpJSONCollection</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'{'</span></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'}'</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0</span></span><span> </span><span class="annot"><span class="annottext">[JSONValue]
+</span><a href="#local-6989586621679033055"><span class="hs-identifier hs-var">a</span></a></span><span>
+</span><span id="line-28"></span><span class="annot"><a href="J4HSKL.File.html#dumpJSON"><span class="hs-identifier hs-var">dumpJSON</span></a></span><span> </span><span id="local-6989586621679033054"><span class="annot"><span class="annottext">JSONValue
+</span><a href="#local-6989586621679033054"><span class="hs-identifier hs-var">a</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">JSONValue -&gt; FilePath
+forall a. Show a =&gt; a -&gt; FilePath
+</span><span class="hs-identifier hs-var">show</span></span><span> </span><span class="annot"><span class="annottext">JSONValue
+</span><a href="#local-6989586621679033054"><span class="hs-identifier hs-var">a</span></a></span><span>
+</span><span id="line-29"></span><span>
+</span><span id="line-30"></span><span class="annot"><a href="J4HSKL.File.html#dumpJSONCollection"><span class="hs-identifier hs-type">dumpJSONCollection</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="J4HSKL.Data.html#JSONValue"><span class="hs-identifier hs-type">JSONValue</span></a></span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span>
+</span><span id="line-31"></span><span id="dumpJSONCollection"><span class="annot"><span class="annottext">dumpJSONCollection :: Char -&gt; Char -&gt; Int -&gt; [JSONValue] -&gt; FilePath
+</span><a href="J4HSKL.File.html#dumpJSONCollection"><span class="hs-identifier hs-var hs-var">dumpJSONCollection</span></a></span></span><span> </span><span id="local-6989586621679033052"><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679033052"><span class="hs-identifier hs-var">begin</span></a></span></span><span> </span><span id="local-6989586621679033051"><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679033051"><span class="hs-identifier hs-var">end</span></a></span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679033052"><span class="hs-identifier hs-var">begin</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679033051"><span class="hs-identifier hs-var">end</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-32"></span><span class="annot"><a href="J4HSKL.File.html#dumpJSONCollection"><span class="hs-identifier hs-var">dumpJSONCollection</span></a></span><span> </span><span id="local-6989586621679033050"><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679033050"><span class="hs-identifier hs-var">begin</span></a></span></span><span> </span><span id="local-6989586621679033049"><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679033049"><span class="hs-identifier hs-var">end</span></a></span></span><span> </span><span id="local-6989586621679033048"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679033048"><span class="hs-identifier hs-var">depth</span></a></span></span><span> </span><span id="local-6989586621679033047"><span class="annot"><span class="annottext">[JSONValue]
+</span><a href="#local-6989586621679033047"><span class="hs-identifier hs-var">a</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">FilePath -&gt; Char -&gt; FilePath -&gt; FilePath -&gt; Char -&gt; FilePath
+forall r. PrintfType r =&gt; FilePath -&gt; r
+</span><span class="hs-identifier hs-var">printf</span></span><span> </span><span class="annot"><span class="annottext">FilePath
+</span><span class="hs-string">&quot;%c\n%s%s%c&quot;</span></span><span> </span><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679033050"><span class="hs-identifier hs-var">begin</span></a></span><span> </span><span class="annot"><span class="annottext">FilePath
+</span><a href="#local-6989586621679033046"><span class="hs-identifier hs-var">content</span></a></span><span> </span><span class="annot"><span class="annottext">FilePath
+</span><a href="#local-6989586621679033045"><span class="hs-identifier hs-var">endIndent</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679033049"><span class="hs-identifier hs-var">end</span></a></span><span>
+</span><span id="line-33"></span><span>    </span><span class="hs-keyword">where</span><span>
+</span><span id="line-34"></span><span>        </span><span id="local-6989586621679033046"><span class="annot"><span class="annottext">content :: FilePath
+</span><a href="#local-6989586621679033046"><span class="hs-identifier hs-var hs-var">content</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char -&gt; Char -&gt; Int -&gt; [JSONValue] -&gt; FilePath
+</span><a href="J4HSKL.File.html#dumpJSONCollectionContent"><span class="hs-identifier hs-var">dumpJSONCollectionContent</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679033050"><span class="hs-identifier hs-var">begin</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679033049"><span class="hs-identifier hs-var">end</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679033048"><span class="hs-identifier hs-var">depth</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">+</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">1</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">[JSONValue]
+</span><a href="#local-6989586621679033047"><span class="hs-identifier hs-var">a</span></a></span><span>
+</span><span id="line-35"></span><span>        </span><span id="local-6989586621679033045"><span class="annot"><span class="annottext">endIndent :: FilePath
+</span><a href="#local-6989586621679033045"><span class="hs-identifier hs-var hs-var">endIndent</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Char -&gt; FilePath
+forall a. Int -&gt; a -&gt; [a]
+</span><span class="hs-identifier hs-var">replicate</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679033048"><span class="hs-identifier hs-var">depth</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\t'</span></span><span>
+</span><span id="line-36"></span><span>
+</span><span id="line-37"></span><span class="annot"><a href="J4HSKL.File.html#dumpJSONCollectionContent"><span class="hs-identifier hs-type">dumpJSONCollectionContent</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="J4HSKL.Data.html#JSONValue"><span class="hs-identifier hs-type">JSONValue</span></a></span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span>
+</span><span id="line-38"></span><span id="dumpJSONCollectionContent"><span class="annot"><span class="annottext">dumpJSONCollectionContent :: Char -&gt; Char -&gt; Int -&gt; [JSONValue] -&gt; FilePath
+</span><a href="J4HSKL.File.html#dumpJSONCollectionContent"><span class="hs-identifier hs-var hs-var">dumpJSONCollectionContent</span></a></span></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-identifier">_</span></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-identifier">_</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">FilePath
+</span><span class="hs-string">&quot;&quot;</span></span><span>
+</span><span id="line-39"></span><span class="annot"><a href="J4HSKL.File.html#dumpJSONCollectionContent"><span class="hs-identifier hs-var">dumpJSONCollectionContent</span></a></span><span> </span><span id="local-6989586621679033041"><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679033041"><span class="hs-identifier hs-var">begin</span></a></span></span><span> </span><span id="local-6989586621679033040"><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679033040"><span class="hs-identifier hs-var">end</span></a></span></span><span> </span><span id="local-6989586621679033039"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679033039"><span class="hs-identifier hs-var">depth</span></a></span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679033038"><span class="annot"><span class="annottext">JSONValue
+</span><a href="#local-6989586621679033038"><span class="hs-identifier hs-var">head</span></a></span></span><span class="annot"><span class="hs-glyph hs-type">:</span></span><span id="local-6989586621679033037"><span class="annot"><span class="annottext">[JSONValue]
+</span><a href="#local-6989586621679033037"><span class="hs-identifier hs-var">rest</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">FilePath
+</span><a href="#local-6989586621679033036"><span class="hs-identifier hs-var">indent</span></a></span><span> </span><span class="annot"><span class="annottext">FilePath -&gt; FilePath -&gt; FilePath
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span> </span><span class="annot"><span class="annottext">FilePath
+</span><a href="#local-6989586621679033035"><span class="hs-identifier hs-var">dumpedKey</span></a></span><span> </span><span class="annot"><span class="annottext">FilePath -&gt; FilePath -&gt; FilePath
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span> </span><span class="annot"><span class="annottext">FilePath
+</span><a href="#local-6989586621679033034"><span class="hs-identifier hs-var">dumpedValue</span></a></span><span> </span><span class="annot"><span class="annottext">FilePath -&gt; FilePath -&gt; FilePath
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span> </span><span class="annot"><span class="annottext">FilePath
+</span><a href="#local-6989586621679033033"><span class="hs-identifier hs-var">separator</span></a></span><span> </span><span class="annot"><span class="annottext">FilePath -&gt; FilePath -&gt; FilePath
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span> </span><span class="annot"><span class="annottext">FilePath
+</span><a href="#local-6989586621679033032"><span class="hs-identifier hs-var">dumpedRest</span></a></span><span>
+</span><span id="line-40"></span><span>    </span><span class="hs-keyword">where</span><span>
+</span><span id="line-41"></span><span>        </span><span id="local-6989586621679033036"><span class="annot"><span class="annottext">indent :: FilePath
+</span><a href="#local-6989586621679033036"><span class="hs-identifier hs-var hs-var">indent</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Char -&gt; FilePath
+forall a. Int -&gt; a -&gt; [a]
+</span><span class="hs-identifier hs-var">replicate</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679033039"><span class="hs-identifier hs-var">depth</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\t'</span></span><span>
+</span><span id="line-42"></span><span>        </span><span id="local-6989586621679033035"><span class="annot"><span class="annottext">dumpedKey :: FilePath
+</span><a href="#local-6989586621679033035"><span class="hs-identifier hs-var hs-var">dumpedKey</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">Maybe FilePath
+</span><a href="#local-6989586621679033031"><span class="hs-identifier hs-var">key</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-43"></span><span>            </span><span class="annot"><span class="annottext">Maybe FilePath
+</span><span class="hs-identifier hs-var">Nothing</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">FilePath
+</span><span class="hs-string">&quot;&quot;</span></span><span>
+</span><span id="line-44"></span><span>            </span><span class="annot"><span class="hs-identifier hs-type">Just</span></span><span> </span><span id="local-6989586621679033030"><span class="annot"><span class="annottext">FilePath
+</span><a href="#local-6989586621679033030"><span class="hs-identifier hs-var">k</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">FilePath -&gt; FilePath -&gt; FilePath
+forall r. PrintfType r =&gt; FilePath -&gt; r
+</span><span class="hs-identifier hs-var">printf</span></span><span> </span><span class="annot"><span class="annottext">FilePath
+</span><span class="hs-string">&quot;%s: &quot;</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">JSONValue -&gt; FilePath
+</span><a href="J4HSKL.File.html#dumpJSON"><span class="hs-identifier hs-var">dumpJSON</span></a></span><span> </span><span class="annot"><span class="annottext">(JSONValue -&gt; FilePath) -&gt; JSONValue -&gt; FilePath
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">FilePath -&gt; JSONValue
+</span><a href="J4HSKL.Data.html#String"><span class="hs-identifier hs-var">String</span></a></span><span> </span><span class="annot"><span class="annottext">FilePath
+</span><a href="#local-6989586621679033030"><span class="hs-identifier hs-var">k</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-45"></span><span>        </span><span id="local-6989586621679033034"><span class="annot"><span class="annottext">dumpedValue :: FilePath
+</span><a href="#local-6989586621679033034"><span class="hs-identifier hs-var hs-var">dumpedValue</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">JSONValue
+</span><a href="#local-6989586621679033028"><span class="hs-identifier hs-var">value</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-46"></span><span>            </span><span class="annot"><a href="J4HSKL.Data.html#Array"><span class="hs-identifier hs-type">Array</span></a></span><span> </span><span id="local-6989586621679033027"><span class="annot"><span class="annottext">[JSONValue]
+</span><a href="#local-6989586621679033027"><span class="hs-identifier hs-var">a</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Char -&gt; Char -&gt; Int -&gt; [JSONValue] -&gt; FilePath
+</span><a href="J4HSKL.File.html#dumpJSONCollection"><span class="hs-identifier hs-var">dumpJSONCollection</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'['</span></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">']'</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679033039"><span class="hs-identifier hs-var">depth</span></a></span><span> </span><span class="annot"><span class="annottext">[JSONValue]
+</span><a href="#local-6989586621679033027"><span class="hs-identifier hs-var">a</span></a></span><span>
+</span><span id="line-47"></span><span>            </span><span class="annot"><a href="J4HSKL.Data.html#Object"><span class="hs-identifier hs-type">Object</span></a></span><span> </span><span id="local-6989586621679033026"><span class="annot"><span class="annottext">[JSONValue]
+</span><a href="#local-6989586621679033026"><span class="hs-identifier hs-var">a</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Char -&gt; Char -&gt; Int -&gt; [JSONValue] -&gt; FilePath
+</span><a href="J4HSKL.File.html#dumpJSONCollection"><span class="hs-identifier hs-var">dumpJSONCollection</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'{'</span></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'}'</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679033039"><span class="hs-identifier hs-var">depth</span></a></span><span> </span><span class="annot"><span class="annottext">[JSONValue]
+</span><a href="#local-6989586621679033026"><span class="hs-identifier hs-var">a</span></a></span><span>
+</span><span id="line-48"></span><span>            </span><span id="local-6989586621679033025"><span class="annot"><span class="annottext">JSONValue
+</span><a href="#local-6989586621679033025"><span class="hs-identifier hs-var">a</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">JSONValue -&gt; FilePath
+forall a. Show a =&gt; a -&gt; FilePath
+</span><span class="hs-identifier hs-var">show</span></span><span> </span><span class="annot"><span class="annottext">JSONValue
+</span><a href="#local-6989586621679033025"><span class="hs-identifier hs-var">a</span></a></span><span>
+</span><span id="line-49"></span><span>        </span><span id="local-6989586621679033033"><span class="annot"><span class="annottext">separator :: FilePath
+</span><a href="#local-6989586621679033033"><span class="hs-identifier hs-var hs-var">separator</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">if</span><span> </span><span class="annot"><span class="annottext">[JSONValue] -&gt; Bool
+forall (t :: * -&gt; *) a. Foldable t =&gt; t a -&gt; Bool
+</span><span class="hs-identifier hs-var">null</span></span><span> </span><span class="annot"><span class="annottext">[JSONValue]
+</span><a href="#local-6989586621679033037"><span class="hs-identifier hs-var">rest</span></a></span><span> </span><span class="hs-keyword">then</span><span> </span><span class="annot"><span class="annottext">FilePath
+</span><span class="hs-string">&quot;\n&quot;</span></span><span> </span><span class="hs-keyword">else</span><span> </span><span class="annot"><span class="annottext">FilePath
+</span><span class="hs-string">&quot;,\n&quot;</span></span><span>
+</span><span id="line-50"></span><span>        </span><span id="local-6989586621679033032"><span class="annot"><span class="annottext">dumpedRest :: FilePath
+</span><a href="#local-6989586621679033032"><span class="hs-identifier hs-var hs-var">dumpedRest</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char -&gt; Char -&gt; Int -&gt; [JSONValue] -&gt; FilePath
+</span><a href="J4HSKL.File.html#dumpJSONCollectionContent"><span class="hs-identifier hs-var">dumpJSONCollectionContent</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679033041"><span class="hs-identifier hs-var">begin</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679033040"><span class="hs-identifier hs-var">end</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679033039"><span class="hs-identifier hs-var">depth</span></a></span><span> </span><span class="annot"><span class="annottext">[JSONValue]
+</span><a href="#local-6989586621679033037"><span class="hs-identifier hs-var">rest</span></a></span><span>
+</span><span id="line-51"></span><span>        </span><span class="hs-special">(</span><span id="local-6989586621679033031"><span class="annot"><span class="annottext">Maybe FilePath
+</span><a href="#local-6989586621679033031"><span class="hs-identifier hs-var">key</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679033028"><span class="annot"><span class="annottext">JSONValue
+</span><a href="#local-6989586621679033028"><span class="hs-identifier hs-var">value</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">JSONValue
+</span><a href="#local-6989586621679033038"><span class="hs-identifier hs-var">head</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-52"></span><span>            </span><span class="annot"><a href="J4HSKL.Data.html#Pair"><span class="hs-identifier hs-type">Pair</span></a></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679033022"><span class="annot"><span class="annottext">FilePath
+</span><a href="#local-6989586621679033022"><span class="hs-identifier hs-var">a</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679033021"><span class="annot"><span class="annottext">JSONValue
+</span><a href="#local-6989586621679033021"><span class="hs-identifier hs-var">b</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">FilePath -&gt; Maybe FilePath
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">FilePath
+</span><a href="#local-6989586621679033022"><span class="hs-identifier hs-var">a</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">JSONValue
+</span><a href="#local-6989586621679033021"><span class="hs-identifier hs-var">b</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-53"></span><span>            </span><span id="local-6989586621679033020"><span class="annot"><span class="annottext">JSONValue
+</span><a href="#local-6989586621679033020"><span class="hs-identifier hs-var">a</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Maybe FilePath
+forall a. Maybe a
+</span><span class="hs-identifier hs-var">Nothing</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">JSONValue
+</span><a href="#local-6989586621679033020"><span class="hs-identifier hs-var">a</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-54"></span><span>
+</span><span id="line-55"></span><span>
+</span><span id="line-56"></span><span class="hs-comment">-- | Import a file's content and parse its JSON content</span><span>
+</span><span id="line-57"></span><span class="annot"><a href="J4HSKL.File.html#importJSON"><span class="hs-identifier hs-type">importJSON</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">FilePath</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="annot"><a href="J4HSKL.Data.html#JSONValue"><span class="hs-identifier hs-type">JSONValue</span></a></span><span>
+</span><span id="line-58"></span><span id="importJSON"><span class="annot"><span class="annottext">importJSON :: FilePath -&gt; IO JSONValue
+</span><a href="J4HSKL.File.html#importJSON"><span class="hs-identifier hs-var hs-var">importJSON</span></a></span></span><span> </span><span id="local-6989586621679033018"><span class="annot"><span class="annottext">FilePath
+</span><a href="#local-6989586621679033018"><span class="hs-identifier hs-var">filepath</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-59"></span><span>    </span><span id="local-6989586621679033017"><span class="annot"><span class="annottext">FilePath
+</span><a href="#local-6989586621679033017"><span class="hs-identifier hs-var">content</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">FilePath -&gt; IO FilePath
+</span><span class="hs-identifier hs-var">readFile</span></span><span> </span><span class="annot"><span class="annottext">FilePath
+</span><a href="#local-6989586621679033018"><span class="hs-identifier hs-var">filepath</span></a></span><span>
+</span><span id="line-60"></span><span>    </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">Parser JSONValue -&gt; ParserFunction JSONValue
+forall a. Parser a -&gt; ParserFunction a
+</span><a href="BasicParser.html#runParser"><span class="hs-identifier hs-var hs-var">runParser</span></a></span><span> </span><span class="annot"><span class="annottext">Parser JSONValue
+</span><a href="J4HSKL.Parser.html#parseJSON"><span class="hs-identifier hs-var">parseJSON</span></a></span><span> </span><span class="annot"><span class="annottext">FilePath
+</span><a href="#local-6989586621679033017"><span class="hs-identifier hs-var">content</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-61"></span><span>        </span><span class="annot"><span class="hs-identifier hs-type">Just</span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679033014"><span class="annot"><span class="annottext">JSONValue
+</span><a href="#local-6989586621679033014"><span class="hs-identifier hs-var">jsonvalue</span></a></span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">FilePath
+</span><span class="hs-identifier">_</span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">JSONValue -&gt; IO JSONValue
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="annot"><span class="annottext">JSONValue
+</span><a href="#local-6989586621679033014"><span class="hs-identifier hs-var">jsonvalue</span></a></span><span>
+</span><span id="line-62"></span><span>        </span><span class="annot"><span class="annottext">Maybe (JSONValue, FilePath)
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">FilePath -&gt; IO JSONValue
+forall a. HasCallStack =&gt; FilePath -&gt; a
+</span><span class="hs-identifier hs-var">error</span></span><span> </span><span class="annot"><span class="annottext">(FilePath -&gt; IO JSONValue) -&gt; FilePath -&gt; IO JSONValue
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">FilePath -&gt; FilePath -&gt; FilePath
+forall r. PrintfType r =&gt; FilePath -&gt; r
+</span><span class="hs-identifier hs-var">printf</span></span><span> </span><span class="annot"><span class="annottext">FilePath
+</span><span class="hs-string">&quot;%s: Invalid JSON content&quot;</span></span><span> </span><span class="annot"><span class="annottext">FilePath
+</span><a href="#local-6989586621679033018"><span class="hs-identifier hs-var">filepath</span></a></span></pre></body></html>

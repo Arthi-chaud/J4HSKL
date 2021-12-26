@@ -32,8 +32,6 @@ These functions are documented [here](https://arthi-chaud.github.io/J4HSKL/J4HSK
 
 ## Upcoming features
 
-- Beautified dump
-- Import/export from file
 - Better delivery method
 
 ## Build

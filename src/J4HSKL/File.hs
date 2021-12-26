@@ -19,7 +19,7 @@ import Data.Maybe (isNothing)
 
 -- | Export value to JSON-formatted in file
 exportJSON :: JSONValue -> FilePath -> IO()
-exportJSON value path = writeFile "file.txt" $ show value
+exportJSON value path = writeFile path $ dumpJSON value
 
 -- | Dump data to JSON-formatted string, with indentation
 dumpJSON :: JSONValue -> String

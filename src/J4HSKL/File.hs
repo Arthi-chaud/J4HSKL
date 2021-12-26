@@ -15,6 +15,7 @@ import J4HSKL.Parser
 import BasicParser (Parser(runParser))
 import GHC.Base (error)
 import Text.Printf(printf)
+import Data.Maybe (isNothing)
 
 -- | Export value to JSON-formatted in file
 exportJSON :: JSONValue -> FilePath -> IO()
@@ -35,15 +36,22 @@ dumpJSONCollection begin end depth a = printf "%c\n%s%s%c" begin content endInde
 
 dumpJSONCollectionContent :: Char -> Char -> Int -> [JSONValue] -> String
 dumpJSONCollectionContent _ _ _ [] = ""
-dumpJSONCollectionContent begin end depth (head:rest) = indent ++ dumpedValue ++ separator ++ dumpedRest
+dumpJSONCollectionContent begin end depth (head:rest) = indent ++ dumpedKey ++ dumpedValue ++ separator ++ dumpedRest
     where
         indent = replicate depth '\t'
-        dumpedValue = case head of
+        dumpedKey = case key of
+            Nothing -> ""
+            Just k -> printf "%s: " (dumpJSON $ String k)
+        dumpedValue = case value of
             Array a -> dumpJSONCollection '[' ']' depth a
             Object a -> dumpJSONCollection '{' '}' depth a
             a -> show a
         separator = if null rest then "\n" else ",\n"
         dumpedRest = dumpJSONCollectionContent begin end depth rest
+        (key, value) = case head of
+            Pair (a, b) -> (Just a, b)
+            a -> (Nothing, a)
+
 
 -- | Import a file's content and parse its JSON content
 importJSON :: FilePath -> IO JSONValue

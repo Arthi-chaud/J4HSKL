@@ -26,6 +26,10 @@ Using ```JSONValue``` data, you can format them using JSON format, thanks to ```
 
 Read documentation [here](https://arthi-chaud.github.io/J4HSKL/J4HSKL-Data.html) to understand how to manage JSON-parsed data
 
+To import from/export to file, use respectively ```importJSON``` and ```exportJSON``` functions
+
+These functions are documented [here](https://arthi-chaud.github.io/J4HSKL/J4HSKL-File.html)
+
 ## Upcoming features
 
 - Beautified dump

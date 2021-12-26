@@ -92,7 +92,7 @@ parseJSONObject = Parser $ \s -> do
     where keyList = \(Pair (key, value)) -> key
 
 -- | Parse pair in object from JSON
-parseJSONPair :: Parser JSONPair
+parseJSONPair :: Parser JSONValue 
 parseJSONPair = (\(String key, value) -> Pair (key, value)) <$> ((parseJSONString <* parseSeparator) <&> parseJSON)
     where
         parseSeparator = parseWhitespaces <* parseChar ':' <* parseWhitespaces

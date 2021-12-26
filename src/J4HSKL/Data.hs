@@ -24,7 +24,8 @@ data JSONValue =
    | Number Float  -- ^ Number for JSON
    | String String -- ^ String for JSON
    | Array [JSONValue] -- ^ Array for JSON
-   | Object [JSONPair] -- ^ JSON's Object
+   | Pair (String, JSONValue) -- ^ Pair for Objects (only used in object, never as standalone)
+   | Object [JSONValue] -- ^ JSON's Object
 
 
 instance Show JSONValue where
@@ -34,6 +35,7 @@ instance Show JSONValue where
     show (Number v) = showJSONNumber v
     show (String v) = printf "\"%s\"" $ showJSONString v
     show (Array v) = printf "[%s]" (intercalate ", " $ map show v)
+    show (Pair (key, value)) = printf "%s: %s" (show key) $ show value
     show (Object v) = printf "{%s}" (intercalate ", " $ map show v)
 
 instance Eq JSONValue where
@@ -43,14 +45,8 @@ instance Eq JSONValue where
     (==) (String a) (String b) = a == b
     (==) (Array a) (Array b) = a == b
     (==) (Object a) (Object b) = a == b
+    (==) (Pair a) (Pair b) = a == b
     (==) _ _ = False
-
--- | Pair for JSON (only used in object, never as standalone)
-newtype JSONPair = Pair (String, JSONValue)
-instance Show JSONPair where
-    show (Pair (key, value)) = printf "%s: %s" (show key) $ show value
-instance Eq JSONPair where
-    (==) (Pair (key1, value1)) (Pair (key2, value2)) = key1 == key2 && value1 == value2
 
 -- | Fromat String for JSON (without quotes)
 showJSONString :: String -> String

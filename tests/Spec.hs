@@ -2,7 +2,7 @@ import Test.Framework (defaultMain)
 import TestBasicParser
 import TestJ4HSKL.Parser
 import TestJ4HSKL.Data
-import TestJ4HSKL.PrettyPrint
+import TestJ4HSKL.File
 import Assets (loadTestAssets)
 
 main :: IO ()
@@ -12,7 +12,7 @@ main = do
         TestBasicParser.testSuite,
         TestJ4HSKL.Data.testSuite,
         TestJ4HSKL.Parser.testSuite testAssets,
-        TestJ4HSKL.PrettyPrint.testSuite
+        TestJ4HSKL.File.testSuite
         ]
 
     

@@ -14,15 +14,41 @@ import J4HSKL.Data
 import J4HSKL.Parser
 import BasicParser (Parser(runParser))
 import GHC.Base (error)
-import Text.Printf(printf) 
-    
+import Text.Printf(printf)
+
+-- | Export value to JSON-formatted in file
 exportJSON :: JSONValue -> FilePath -> IO()
 exportJSON value path = writeFile "file.txt" $ show value
 
+-- | Dump data to JSON-formatted string, with indentation
+dumpJSON :: JSONValue -> String
+dumpJSON (Array a) = dumpJSONCollection '[' ']' 0 a
+dumpJSON (Object a) = dumpJSONCollection '{' '}' 0 a
+dumpJSON a = show a
+
+dumpJSONCollection :: Char -> Char -> Int -> [JSONValue] -> String
+dumpJSONCollection begin end _ [] = [begin, end]
+dumpJSONCollection begin end depth a = printf "%c\n%s%s%c" begin content endIndent end
+    where
+        content = dumpJSONCollectionContent begin end (depth + 1) a
+        endIndent = replicate depth '\t'
+
+dumpJSONCollectionContent :: Char -> Char -> Int -> [JSONValue] -> String
+dumpJSONCollectionContent _ _ _ [] = ""
+dumpJSONCollectionContent begin end depth (head:rest) = indent ++ dumpedValue ++ separator ++ dumpedRest
+    where
+        indent = replicate depth '\t'
+        dumpedValue = case head of
+            Array a -> dumpJSONCollection '[' ']' depth a
+            Object a -> dumpJSONCollection '{' '}' depth a
+            a -> show a
+        separator = if null rest then "\n" else ",\n"
+        dumpedRest = dumpJSONCollectionContent begin end depth rest
+
 -- | Import a file's content and parse its JSON content
-importJSON :: FilePath -> IO JSONValue 
+importJSON :: FilePath -> IO JSONValue
 importJSON filepath = do
     content <- readFile filepath
     case runParser parseJSON content of
         Just (jsonvalue, _) -> return jsonvalue
-        _ -> error $ printf "%s: Invalid JSON content" filepath 
+        _ -> error $ printf "%s: Invalid JSON content" filepath

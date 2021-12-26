@@ -52,11 +52,13 @@ parseJSONNumber = Parser $ \s -> do
             then Nothing
             else return (Number $ number ^^ fromInteger exponent, rest2)
     where
-        parseNumber = parseLeadingZero <^> (parseFloat <|> (fromInteger <$> parseInt))
+        parseNumber = parseMinusZero <^> (parseLeadingZero <^> (parseFloat <|> (fromInteger <$> parseInt)))
+        parseMinusZero = snd <$> parseChar '-' <&> parseLeadingZero
         parseLeadingZero = 0 <$ parseChar '0'
+        parseSignAndLeadingZero = parseSign <&> parseLeadingZero
         parseExponent = parseAnyChar "eE" *> parseExponentNumber
-        parseExponentSign = parseAnyChar "-+" <|> pure '+'
-        parseExponentNumber = uncurry applySign <$> (parseExponentSign <&> ((round <$> parseLeadingZero) <^> parseUInt))
+        parseSign = parseAnyChar "-+" <|> pure '+'
+        parseExponentNumber = uncurry applySign <$> (parseSign <&> ((round <$> parseLeadingZero) <^> parseUInt))
         applySign :: Char -> Integer -> Integer
         applySign '-' nb = nb * (-1)
         applySign _ nb = nb

@@ -41,7 +41,7 @@ testSuite (validAssets, invalidAssets) = testGroup "JSON Parser module" (testsOn
             testValidAsset validAssets "number_exposed_negative" (Number (3 ^^(-10))),
             testValidAsset validAssets "number_exposed_positive" (Number (30 ^ 2)),
             testValidAsset validAssets "number_exposed_uppercase" (Number (10 ^ 34)),
-            testValidAsset validAssets "number_float_exposed" (Number (3 ^ 2)),
+            testValidAsset validAssets "number_float_exposed" (Number $ 123.45678 ** 10),
             testValidAsset validAssets "number_float_exposed_negative" (Number (123.45678 ** (-10))),
             testValidAsset validAssets "number_float" (Number 123.45678),
             testValidAsset validAssets "number" (Number 3),
